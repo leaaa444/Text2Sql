@@ -1,0 +1,49 @@
+# Tajne i okruzenje (NIKAD u git)
+.env
+.env.local
+.env.*.local
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Node / Next.js (frontend)
+node_modules/
+.next/
+out/
+build/
+next-env.d.ts
+*.tsbuildinfo
+
+# Logovi
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+
+# Podaci i rezultati (skupovi podataka, izlazi eksperimenata)
+data/
+datasets/
+results/
+
+# OS i editori
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Privremeni fajlovi
+*.tmp
+*.bak
+
+# Interni dokumenti (za sada van gita)
+PLAN.md
+README.md

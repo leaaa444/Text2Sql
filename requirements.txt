@@ -1,0 +1,13 @@
+langgraph
+langchain-core
+langchain-anthropic
+langchain-google-genai
+psycopg[binary]
+sqlglot
+python-dotenv
+pydantic
+fastapi
+uvicorn[standard]
+pandas
+matplotlib
+tabulate

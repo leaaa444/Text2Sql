@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: text2sql-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: t2s_admin
+      POSTGRES_PASSWORD: t2s_admin_pw
+      POSTGRES_DB: text2sql
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d
+
+volumes:
+  pgdata:

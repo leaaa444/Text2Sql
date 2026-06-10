@@ -1,0 +1,45 @@
+#read the strucute of the database and create a description of the schema
+
+from agent.db.connection import run_query
+
+_COLUMNS_SQL = """
+select table_name, column_name, data_type
+from information_schema.columns
+where table_schema = 'public'
+order by table_name, ordinal_position
+"""
+
+_FK_SQL = """
+select
+  con.conrelid::regclass::text as table_name,
+  att.attname as column_name,
+  con.confrelid::regclass::text as foreign_table,
+  fatt.attname as foreign_column
+from pg_constraint con
+join pg_namespace ns on ns.oid = con.connamespace
+join unnest(con.conkey) with ordinality as ck(attnum, ord) on true
+join pg_attribute att
+  on att.attrelid = con.conrelid and att.attnum = ck.attnum
+join unnest(con.confkey) with ordinality as fk(attnum, ord) on fk.ord = ck.ord
+join pg_attribute fatt
+  on fatt.attrelid = con.confrelid and fatt.attnum = fk.attnum
+where con.contype = 'f' and ns.nspname = 'public'
+order by table_name
+"""
+
+
+def get_schema_text():
+    _, column_rows = run_query(_COLUMNS_SQL)
+    tables = {}
+    for table, column, data_type in column_rows:
+        tables.setdefault(table, []).append(f"{column} {data_type}")
+
+    _, fk_rows = run_query(_FK_SQL)
+
+    lines = [f"{table}(" + ", ".join(cols) + ")" for table, cols in tables.items()]
+    if fk_rows:
+        lines.append("")
+        lines.append("Foreign keys:")
+        for table, column, ftable, fcolumn in fk_rows:
+            lines.append(f"  {table}.{column} -> {ftable}.{fcolumn}")
+    return "\n".join(lines)
