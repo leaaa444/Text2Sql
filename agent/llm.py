@@ -19,4 +19,8 @@ def get_llm(provider=None, model=None):
         from langchain_google_genai import ChatGoogleGenerativeAI
 
         return ChatGoogleGenerativeAI(model=model or settings.gemini_model, temperature=0)
+    if provider == "groq":
+        from langchain_groq import ChatGroq
+
+        return ChatGroq(model=model or settings.groq_model, temperature=0)
     raise ValueError(f"Nepoznat LLM provajder: {provider}")

@@ -37,12 +37,28 @@ export default function AskBox() {
         />
         <button onClick={onAsk}>Pitaj</button>
       </div>
+
       {loading && <p className="muted">Razmišljam…</p>}
       {result?.error && <p className="muted">Greška: {result.error}</p>}
-      {result && !result.error && result.sql && (
+
+      {result && !result.error && (
         <>
-          <p className="muted">Generisani SQL:</p>
-          <pre>{result.sql}</pre>
+          {result.plan && result.plan.length > 0 && (
+            <>
+              <p className="muted">Plan (koraci agenta):</p>
+              <ol>
+                {result.plan.map((step, i) => (
+                  <li key={i}>{step}</li>
+                ))}
+              </ol>
+            </>
+          )}
+          {result.sql && (
+            <>
+              <p className="muted">Generisani SQL:</p>
+              <pre>{result.sql}</pre>
+            </>
+          )}
           {result.columns && result.rows && (
             <DataTable columns={result.columns} rows={result.rows} />
           )}

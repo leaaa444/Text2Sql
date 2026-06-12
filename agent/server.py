@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from agent import baseline
+from agent import graph as agent_graph
 from agent.db.connection import run_query
 from agent.db.schema import get_schema_text
 
@@ -63,10 +63,16 @@ def api_ask(req: AskRequest):
     if not question:
         raise HTTPException(status_code=400, detail="Prazno pitanje")
     try:
-        sql, columns, rows = baseline.answer(question)
+        out = agent_graph.answer(question)
     except Exception as exc:
         return {"error": str(exc)}
-    return {"sql": sql, "columns": columns, "rows": [[_clean(v) for v in row] for row in rows]}
+    return {
+        "plan": out["plan"],
+        "sql": out["sql"],
+        "columns": out["columns"],
+        "rows": [[_clean(v) for v in row] for row in out["rows"]],
+        "error": out["error"],
+    }
 
 
 if __name__ == "__main__":

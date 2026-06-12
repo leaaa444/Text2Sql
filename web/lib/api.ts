@@ -6,6 +6,7 @@ export type TableData = {
 };
 
 export type AskResult = {
+  plan?: string[];
   sql?: string;
   columns?: string[];
   rows?: Cell[][];

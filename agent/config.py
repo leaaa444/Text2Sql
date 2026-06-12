@@ -14,6 +14,7 @@ class Settings:
     llm_provider: str = os.getenv("LLM_PROVIDER", "anthropic")
     anthropic_model: str = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-6")
     gemini_model: str = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+    groq_model: str = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
     db_host: str = os.getenv("DB_HOST", "localhost")
     db_port: int = int(os.getenv("DB_PORT", "5432"))
     db_name: str = os.getenv("DB_NAME", "text2sql")
