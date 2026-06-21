@@ -5,12 +5,19 @@ export type TableData = {
   rows: Cell[][];
 };
 
+export type TraceStep = {
+  node: string;
+  info: string;
+};
+
 export type AskResult = {
   plan?: string[];
   sql?: string;
   columns?: string[];
   rows?: Cell[][];
   error?: string;
+  trace?: TraceStep[];
+  retry_count?: number;
 };
 
 export async function getTables(): Promise<string[]> {

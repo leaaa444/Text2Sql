@@ -72,6 +72,8 @@ def api_ask(req: AskRequest):
         "columns": out["columns"],
         "rows": [[_clean(v) for v in row] for row in out["rows"]],
         "error": out["error"],
+        "trace": out["trace"],
+        "retry_count": out["retry_count"],
     }
 
 

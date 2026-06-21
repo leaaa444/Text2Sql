@@ -43,3 +43,10 @@ def get_schema_text():
         for table, column, ftable, fcolumn in fk_rows:
             lines.append(f"  {table}.{column} -> {ftable}.{fcolumn}")
     return "\n".join(lines)
+
+
+def get_table_names():
+    _, rows = run_query(
+        "select table_name from information_schema.tables where table_schema = 'public'"
+    )
+    return [row[0] for row in rows]

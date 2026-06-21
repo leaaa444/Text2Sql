@@ -39,9 +39,8 @@ export default function AskBox() {
       </div>
 
       {loading && <p className="muted">Razmišljam…</p>}
-      {result?.error && <p className="muted">Greška: {result.error}</p>}
 
-      {result && !result.error && (
+      {result && (
         <>
           {result.plan && result.plan.length > 0 && (
             <>
@@ -53,14 +52,34 @@ export default function AskBox() {
               </ol>
             </>
           )}
+
           {result.sql && (
             <>
               <p className="muted">Generisani SQL:</p>
               <pre>{result.sql}</pre>
             </>
           )}
-          {result.columns && result.rows && (
+
+          {result.error && <p className="muted">Greška: {result.error}</p>}
+
+          {!result.error && result.columns && result.rows && (
             <DataTable columns={result.columns} rows={result.rows} />
+          )}
+
+          {result.trace && result.trace.length > 0 && (
+            <>
+              <p className="muted">
+                Koraci agenta (iza kulisa)
+                {result.retry_count ? ` · popravki: ${result.retry_count}` : ""}:
+              </p>
+              <ol>
+                {result.trace.map((step, i) => (
+                  <li key={i}>
+                    <b>{step.node}</b> — {step.info}
+                  </li>
+                ))}
+              </ol>
+            </>
           )}
         </>
       )}

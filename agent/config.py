@@ -23,6 +23,7 @@ class Settings:
     db_readonly_user: str = os.getenv("DB_READONLY_USER", "t2s_readonly")
     db_readonly_password: str = os.getenv("DB_READONLY_PASSWORD", "t2s_readonly_pw")
     result_limit: int = 100
+    max_retries: int = int(os.getenv("MAX_RETRIES", "2"))
 
 
 settings = Settings()
