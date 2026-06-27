@@ -8,6 +8,7 @@ class AgentState(TypedDict, total=False):
     plan: list[str]
     sql: str
     validation_error: str
+    guard_error: str
     columns: list[str]
     rows: list[list[Any]]
     error: str

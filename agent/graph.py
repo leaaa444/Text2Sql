@@ -3,6 +3,7 @@ from langgraph.graph import END, START, StateGraph
 from agent.config import settings
 from agent.nodes.deliberator import deliberator_node
 from agent.nodes.executor import executor_node
+from agent.nodes.guard import guard_node
 from agent.nodes.integrator import integrator_node
 from agent.nodes.planner import planner_node
 from agent.nodes.recorder import recorder_load_node, recorder_save_node
@@ -15,6 +16,12 @@ def _route_after_integrator(state):
     if state.get("validation_error"):
         if state.get("retry_count", 0) < settings.max_retries:
             return "reflector"
+        return "kraj"
+    return "guard"
+
+
+def _route_after_guard(state):
+    if state.get("guard_error"):
         return "kraj"
     return "executor"
 
@@ -33,6 +40,7 @@ def _build():
     builder.add_node("deliberator", deliberator_node)
     builder.add_node("integrator", integrator_node)
     builder.add_node("reflector", reflector_node)
+    builder.add_node("guard", guard_node)
     builder.add_node("executor", executor_node)
     builder.add_node("recorder_save", recorder_save_node)
 
@@ -44,7 +52,12 @@ def _build():
     builder.add_conditional_edges(
         "integrator",
         _route_after_integrator,
-        {"reflector": "reflector", "executor": "executor", "kraj": "recorder_save"},
+        {"reflector": "reflector", "guard": "guard", "kraj": "recorder_save"},
+    )
+    builder.add_conditional_edges(
+        "guard",
+        _route_after_guard,
+        {"executor": "executor", "kraj": "recorder_save"},
     )
     builder.add_conditional_edges(
         "executor",
@@ -61,7 +74,11 @@ graph = _build()
 
 def answer(question):
     final = graph.invoke({"question": question, "trace": []})
-    error = final.get("error") or final.get("validation_error")
+    error = (
+        final.get("error")
+        or final.get("validation_error")
+        or final.get("guard_error")
+    )
     return {
         "plan": final.get("plan", []),
         "sql": final.get("sql", ""),
