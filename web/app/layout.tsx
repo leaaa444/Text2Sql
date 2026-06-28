@@ -2,7 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Manrope, JetBrains_Mono } from "next/font/google";
-import Sidebar from "@/components/Sidebar";
+import Navbar from "@/components/Navbar";
 
 const sans = Manrope({ subsets: ["latin", "latin-ext"], variable: "--font-sans", display: "swap" });
 const mono = JetBrains_Mono({ subsets: ["latin", "latin-ext"], variable: "--font-mono", display: "swap" });
@@ -16,7 +16,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="sr" className={`${sans.variable} ${mono.variable}`}>
       <body>
         <div className="app">
-          <Sidebar />
+          <Navbar />
           <main className="main">{children}</main>
         </div>
       </body>

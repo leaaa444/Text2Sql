@@ -8,18 +8,18 @@ const links = [
   { href: "/tabele", label: "Tabele" },
 ];
 
-export default function Sidebar() {
+export default function Navbar() {
   const path = usePathname();
   return (
-    <aside className="sidebar">
-      <div className="brand">
+    <header className="navbar">
+      <Link href="/" className="brand">
         <span className="brand-mark">t2s</span>
         <div>
           <div className="brand-name">text2sql</div>
           <div className="brand-sub">agentni asistent</div>
         </div>
-      </div>
-      <nav>
+      </Link>
+      <nav className="nav-links">
         {links.map((l) => (
           <Link
             key={l.href}
@@ -30,11 +30,6 @@ export default function Sidebar() {
           </Link>
         ))}
       </nav>
-      <div className="sidebar-foot">
-        12 agentnih paterna
-        <br />
-        LangGraph · FastAPI · PostgreSQL
-      </div>
-    </aside>
+    </header>
   );
 }
