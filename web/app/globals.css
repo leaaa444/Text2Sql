@@ -15,3 +15,4 @@ th { background: #f3f4f6; }
 pre { background: #0b1021; color: #d1e7ff; padding: 12px; border-radius: 8px; overflow: auto; font-size: 13px; }
 h3 { font-size: 14px; margin: 14px 0 0; }
 .muted { color: #6b7280; font-size: 13px; }
+.answer { background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 12px; font-size: 15px; color: #14532d; margin: 4px 0 12px; }

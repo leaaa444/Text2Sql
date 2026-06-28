@@ -42,6 +42,8 @@ export default function AskBox() {
 
       {result && (
         <>
+          {result.summary && <div className="answer">{result.summary}</div>}
+
           {result.plan && result.plan.length > 0 && (
             <>
               <p className="muted">Plan (koraci agenta):</p>

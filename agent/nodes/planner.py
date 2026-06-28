@@ -21,7 +21,8 @@ def _parse_steps(text):
 
 def planner_node(state):
     llm = get_llm()
-    user = f"Database schema:\n{state['schema']}\n\nQuestion: {state['question']}\n\nSteps:"
+    goal = state.get("goal") or state["question"]
+    user = f"Database schema:\n{state['schema']}\n\nQuestion: {goal}\n\nSteps:"
     response = llm.invoke([("system", SYSTEM), ("user", user)])
     steps = _parse_steps(response.content)
     trace = state.get("trace", []) + [{"node": "planner", "info": f"{len(steps)} korak(a)"}]

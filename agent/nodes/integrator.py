@@ -14,9 +14,6 @@ def integrator_node(state):
         parsed = None
         problems.append(f"SQL ne moze da se parsira ({exc})")
 
-    if parsed is not None and not isinstance(parsed, exp.Select):
-        problems.append("upit nije SELECT")
-
     if parsed is not None:
         known = {name.lower() for name in get_table_names()}
         used = {table.name.lower() for table in parsed.find_all(exp.Table)}

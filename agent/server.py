@@ -67,6 +67,7 @@ def api_ask(req: AskRequest):
     except Exception as exc:
         return {"error": str(exc)}
     return {
+        "summary": out["summary"],
         "plan": out["plan"],
         "sql": out["sql"],
         "columns": out["columns"],

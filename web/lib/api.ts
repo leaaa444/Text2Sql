@@ -11,6 +11,7 @@ export type TraceStep = {
 };
 
 export type AskResult = {
+  summary?: string;
   plan?: string[];
   sql?: string;
   columns?: string[];
