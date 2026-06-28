@@ -16,7 +16,7 @@ def _enforce_limit(select, cap):
             current = None
     if current is None or current > cap:
         select = select.limit(cap)
-    return select.sql(dialect="postgres")
+    return select.sql(dialect="postgres", pretty=True)
 
 
 def pii_column_indexes(columns):

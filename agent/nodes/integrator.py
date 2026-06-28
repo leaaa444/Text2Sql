@@ -16,7 +16,11 @@ def integrator_node(state):
 
     if parsed is not None:
         known = {name.lower() for name in get_table_names()}
-        used = {table.name.lower() for table in parsed.find_all(exp.Table)}
+        used = set()
+        for table in parsed.find_all(exp.Table):
+            if (table.db or "").lower() == "information_schema":
+                continue
+            used.add(table.name.lower())
         unknown = used - known
         if unknown:
             problems.append(f"nepoznate tabele: {', '.join(sorted(unknown))}")

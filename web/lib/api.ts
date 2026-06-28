@@ -40,3 +40,17 @@ export async function ask(question: string): Promise<AskResult> {
   });
   return res.json();
 }
+
+export async function resetMemory(): Promise<void> {
+  await fetch("/api/reset", { method: "POST" });
+}
+
+export async function getSuggestions(): Promise<string[]> {
+  try {
+    const res = await fetch("/api/suggestions");
+    const data = await res.json();
+    return data.suggestions ?? [];
+  } catch {
+    return [];
+  }
+}

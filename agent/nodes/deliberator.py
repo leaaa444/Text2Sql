@@ -7,7 +7,9 @@ SYSTEM = (
     "database schema, a question and a short plan, return only the SQL query, "
     "with no explanation and no markdown fences. Select the columns that answer "
     "the question, and also include any column used for ranking or filtering "
-    "(for example, when asked for the most expensive items, also select the price)."
+    "(for example, when asked for the most expensive items, also select the price). "
+    "To list the database's tables or columns, query information_schema (e.g., "
+    "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public')."
 )
 
 

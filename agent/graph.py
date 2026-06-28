@@ -10,8 +10,15 @@ from agent.nodes.presenter import presenter_node
 from agent.nodes.recorder import recorder_load_node, recorder_save_node
 from agent.nodes.reflector import reflector_node
 from agent.nodes.retriever import retriever_node
+from agent.nodes.scope import scope_node
 from agent.nodes.selector import selector_node
 from agent.state import AgentState
+
+
+def _route_after_scope(state):
+    if state.get("scope_error"):
+        return "kraj"
+    return "selector"
 
 
 def _route_after_integrator(state):
@@ -40,6 +47,7 @@ def _build():
     builder = StateGraph(AgentState)
     builder.add_node("recorder_load", recorder_load_node)
     builder.add_node("retriever", retriever_node)
+    builder.add_node("scope", scope_node)
     builder.add_node("selector", selector_node)
     builder.add_node("planner", planner_node)
     builder.add_node("deliberator", deliberator_node)
@@ -52,7 +60,12 @@ def _build():
 
     builder.add_edge(START, "recorder_load")
     builder.add_edge("recorder_load", "retriever")
-    builder.add_edge("retriever", "selector")
+    builder.add_edge("retriever", "scope")
+    builder.add_conditional_edges(
+        "scope",
+        _route_after_scope,
+        {"selector": "selector", "kraj": "recorder_save"},
+    )
     builder.add_edge("selector", "planner")
     builder.add_edge("planner", "deliberator")
     builder.add_edge("deliberator", "integrator")
@@ -86,6 +99,7 @@ def answer(question):
         final.get("error")
         or final.get("validation_error")
         or final.get("guard_error")
+        or final.get("scope_error")
     )
     return {
         "summary": final.get("summary", ""),

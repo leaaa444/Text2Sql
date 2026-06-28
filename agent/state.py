@@ -10,6 +10,7 @@ class AgentState(TypedDict, total=False):
     sql: str
     validation_error: str
     guard_error: str
+    scope_error: str
     columns: list[str]
     rows: list[list[Any]]
     summary: str

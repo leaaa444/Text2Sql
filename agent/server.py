@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from agent import graph as agent_graph
+from agent import memory
+from agent import suggestions
 from agent.db.connection import run_query
 from agent.db.schema import get_schema_text
 
@@ -37,6 +39,17 @@ def _list_tables():
 @app.get("/")
 def root():
     return {"status": "ok", "frontend": "http://localhost:3000"}
+
+
+@app.post("/api/reset")
+def api_reset():
+    memory.reset()
+    return {"status": "ok"}
+
+
+@app.get("/api/suggestions")
+def api_suggestions():
+    return {"suggestions": suggestions.get_suggestions()}
 
 
 @app.get("/api/tables")
