@@ -1,0 +1,27 @@
+{
+  "repeats": 3,
+  "ex": {
+    "po_pokretu": [
+      17,
+      16,
+      17
+    ],
+    "prosek": 16.67,
+    "prosek_pct": 69.4,
+    "min": 16,
+    "max": 17,
+    "n": 24
+  },
+  "sec": {
+    "po_pokretu": [
+      10,
+      9,
+      8
+    ],
+    "prosek": 9.0,
+    "prosek_pct": 90.0,
+    "min": 8,
+    "max": 10,
+    "n": 10
+  }
+}

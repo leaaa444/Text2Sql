@@ -24,6 +24,7 @@ class Settings:
     db_readonly_password: str = os.getenv("DB_READONLY_PASSWORD", "t2s_readonly_pw")
     result_limit: int = 100
     max_retries: int = int(os.getenv("MAX_RETRIES", "2"))
+    llm_rps: float = float(os.getenv("LLM_RPS", "0.2"))
 
 
 settings = Settings()
@@ -32,6 +33,7 @@ settings = Settings()
 @dataclass
 class AblationConfig:
     use_retriever: bool = True
+    use_scope: bool = True
     use_selector: bool = True
     use_planner: bool = True
     use_integrator: bool = True
@@ -39,12 +41,13 @@ class AblationConfig:
     use_reflector: bool = True
     use_recorder: bool = True
     use_skill_build: bool = True
-    max_retries: int = 3
+    max_retries: int = 2
 
     @classmethod
     def baseline(cls):
         return cls(
             use_retriever=False,
+            use_scope=False,
             use_selector=False,
             use_planner=False,
             use_integrator=False,

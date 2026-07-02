@@ -2,6 +2,16 @@
 
 from agent.db.connection import run_query
 
+_BASE_TABLES_SQL = """
+select c.relname
+from pg_class c
+join pg_namespace n on n.oid = c.relnamespace
+where n.nspname = 'public'
+  and c.relkind in ('r', 'p')
+  and c.relispartition = false
+order by c.relname
+"""
+
 _COLUMNS_SQL = """
 select table_name, column_name, data_type
 from information_schema.columns
@@ -29,24 +39,26 @@ order by table_name
 
 
 def get_schema_text():
+    allowed = set(get_table_names())
     _, column_rows = run_query(_COLUMNS_SQL)
     tables = {}
     for table, column, data_type in column_rows:
+        if table not in allowed:
+            continue
         tables.setdefault(table, []).append(f"{column} {data_type}")
 
     _, fk_rows = run_query(_FK_SQL)
+    fks = [r for r in fk_rows if r[0] in allowed and r[2] in allowed]
 
     lines = [f"{table}(" + ", ".join(cols) + ")" for table, cols in tables.items()]
-    if fk_rows:
+    if fks:
         lines.append("")
         lines.append("Foreign keys:")
-        for table, column, ftable, fcolumn in fk_rows:
+        for table, column, ftable, fcolumn in fks:
             lines.append(f"  {table}.{column} -> {ftable}.{fcolumn}")
     return "\n".join(lines)
 
 
 def get_table_names():
-    _, rows = run_query(
-        "select table_name from information_schema.tables where table_schema = 'public'"
-    )
+    _, rows = run_query(_BASE_TABLES_SQL)
     return [row[0] for row in rows]

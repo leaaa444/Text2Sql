@@ -1,3 +1,5 @@
+from agent import ablation
+from agent.db.schema import get_table_names
 from agent.llm import get_llm
 
 SYSTEM = (
@@ -10,9 +12,13 @@ SYSTEM = (
 
 
 def scope_node(state):
+    if not ablation.current.use_scope:
+        trace = state.get("trace", []) + [{"node": "scope", "info": "iskljucen"}]
+        return {"scope_error": None, "trace": trace}
     llm = get_llm()
+    tables = ", ".join(get_table_names())
     user = (
-        f"Database tables and columns:\n{state.get('schema', '')}\n\n"
+        f"Database tables: {tables}\n\n"
         f"Question: {state['question']}\n\n"
         f"Answer (ANSWERABLE or OFFTOPIC):"
     )

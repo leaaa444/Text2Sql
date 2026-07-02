@@ -1,3 +1,4 @@
+from agent import ablation
 from agent import skills
 from agent.baseline import extract_sql
 from agent.llm import get_llm
@@ -17,7 +18,7 @@ def deliberator_node(state):
     llm = get_llm()
     goal = state.get("goal") or state["question"]
     plan = "\n".join(f"- {step}" for step in state.get("plan", []))
-    examples = skills.retrieve(goal, k=2)
+    examples = skills.retrieve(goal, k=2) if ablation.current.use_skill_build else []
     examples_text = "\n\n".join(
         f"Pitanje: {e['question']}\nSQL: {e['sql']}" for e in examples
     )

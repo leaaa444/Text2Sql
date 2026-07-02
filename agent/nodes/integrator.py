@@ -1,10 +1,14 @@
 import sqlglot
 from sqlglot import exp
 
+from agent import ablation
 from agent.db.schema import get_table_names
 
 
 def integrator_node(state):
+    if not ablation.current.use_integrator:
+        trace = state.get("trace", []) + [{"node": "integrator", "info": "iskljucen"}]
+        return {"validation_error": None, "trace": trace}
     sql = state.get("sql", "")
     problems = []
 

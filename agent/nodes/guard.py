@@ -1,6 +1,7 @@
 import sqlglot
 from sqlglot import exp
 
+from agent import ablation
 from agent.config import settings
 
 _PII_HINTS = ("email", "mail", "phone", "telefon", "lozinka", "password")
@@ -54,6 +55,9 @@ def mask_pii(columns, rows):
 
 def guard_node(state):
     sql = state.get("sql", "")
+    if not ablation.current.use_security_guard:
+        trace = state.get("trace", []) + [{"node": "guard", "info": "iskljucen"}]
+        return {"sql": sql, "guard_error": None, "trace": trace}
     blocked_reason = None
 
     try:

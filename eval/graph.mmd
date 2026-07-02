@@ -1,0 +1,42 @@
+---
+config:
+  flowchart:
+    curve: linear
+---
+graph TD;
+	__start__([<p>__start__</p>]):::first
+	recorder_load(recorder_load)
+	retriever(retriever)
+	scope(scope)
+	selector(selector)
+	planner(planner)
+	deliberator(deliberator)
+	integrator(integrator)
+	reflector(reflector)
+	guard(guard)
+	executor(executor)
+	presenter(presenter)
+	recorder_save(recorder_save)
+	__end__([<p>__end__</p>]):::last
+	__start__ --> recorder_load;
+	deliberator --> integrator;
+	executor -.-> presenter;
+	executor -. &nbsp;kraj&nbsp; .-> recorder_save;
+	executor -.-> reflector;
+	guard -.-> executor;
+	guard -. &nbsp;kraj&nbsp; .-> recorder_save;
+	integrator -.-> guard;
+	integrator -. &nbsp;kraj&nbsp; .-> recorder_save;
+	integrator -.-> reflector;
+	planner --> deliberator;
+	presenter --> recorder_save;
+	recorder_load --> retriever;
+	reflector --> integrator;
+	retriever --> scope;
+	scope -. &nbsp;kraj&nbsp; .-> recorder_save;
+	scope -.-> selector;
+	selector --> planner;
+	recorder_save --> __end__;
+	classDef default fill:#f2f0ff,line-height:1.2
+	classDef first fill-opacity:0
+	classDef last fill:#bfb6fc

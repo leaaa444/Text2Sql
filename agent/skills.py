@@ -2,18 +2,19 @@ import difflib
 
 _skills = [
     {
-        "question": "Koliko ima kupaca?",
-        "sql": "SELECT COUNT(*) FROM customers",
+        "question": "Koliko ima filmova?",
+        "sql": "SELECT COUNT(*) FROM film",
     },
     {
-        "question": "Koja tri proizvoda su najskuplja?",
-        "sql": "SELECT name, price FROM products ORDER BY price DESC LIMIT 3",
+        "question": "Kojih pet filmova je najduze?",
+        "sql": "SELECT title, length FROM film ORDER BY length DESC LIMIT 5",
     },
     {
-        "question": "Koliko narudzbina ima svaki kupac?",
+        "question": "Koliko iznajmljivanja ima svaki kupac?",
         "sql": (
-            "SELECT c.name, COUNT(o.id) FROM customers c "
-            "LEFT JOIN orders o ON o.customer_id = c.id GROUP BY c.name"
+            "SELECT c.first_name, c.last_name, COUNT(r.rental_id) FROM customer c "
+            "LEFT JOIN rental r ON r.customer_id = c.customer_id "
+            "GROUP BY c.customer_id, c.first_name, c.last_name"
         ),
     },
 ]

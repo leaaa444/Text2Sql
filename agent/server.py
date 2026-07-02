@@ -28,6 +28,22 @@ def _clean(value):
     return str(value)
 
 
+def _friendly_error(exc):
+    text = str(exc).lower()
+    if any(k in text for k in ("rate_limit", "429", "tokens per", "resource_exhausted", "quota")):
+        return (
+            "Trenutno je previše zahteva prema jezičkom modelu "
+            "(ograničenje besplatnog naloga). Sačekajte nekoliko sekundi pa pokušajte ponovo."
+        )
+    if "timeout" in text or "timed out" in text:
+        return "Jezički model nije odgovorio na vreme. Pokušajte ponovo."
+    if "connection" in text or "network" in text or "getaddrinfo" in text:
+        return "Problem sa mrežnom vezom. Proverite internet i pokušajte ponovo."
+    if "api_key" in text or "unauthorized" in text or "authentication" in text:
+        return "Problem sa pristupom jezičkom modelu (API ključ). Proverite podešavanja."
+    return "Došlo je do greške pri obradi pitanja. Pokušajte ponovo."
+
+
 def _list_tables():
     _, rows = run_query(
         "select table_name from information_schema.tables "
@@ -78,13 +94,17 @@ def api_ask(req: AskRequest):
     try:
         out = agent_graph.answer(question)
     except Exception as exc:
-        return {"error": str(exc)}
+        return {"error": _friendly_error(exc)}
+    answered = out["answered"]
+    columns = out["columns"] if answered else []
+    rows = out["rows"] if answered else []
     return {
         "summary": out["summary"],
         "plan": out["plan"],
         "sql": out["sql"],
-        "columns": out["columns"],
-        "rows": [[_clean(v) for v in row] for row in out["rows"]],
+        "columns": columns,
+        "rows": [[_clean(v) for v in row] for row in rows],
+        "answered": answered,
         "error": out["error"],
         "trace": out["trace"],
         "retry_count": out["retry_count"],

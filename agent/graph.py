@@ -1,6 +1,9 @@
+import time
+
 from langgraph.graph import END, START, StateGraph
 
-from agent.config import settings
+from agent import ablation
+from agent import metrics
 from agent.nodes.deliberator import deliberator_node
 from agent.nodes.executor import executor_node
 from agent.nodes.guard import guard_node
@@ -21,9 +24,16 @@ def _route_after_scope(state):
     return "selector"
 
 
+def _can_reflect(state):
+    return (
+        ablation.current.use_reflector
+        and state.get("retry_count", 0) < ablation.current.max_retries
+    )
+
+
 def _route_after_integrator(state):
     if state.get("validation_error"):
-        if state.get("retry_count", 0) < settings.max_retries:
+        if _can_reflect(state):
             return "reflector"
         return "kraj"
     return "guard"
@@ -37,7 +47,7 @@ def _route_after_guard(state):
 
 def _route_after_executor(state):
     if state.get("error"):
-        if state.get("retry_count", 0) < settings.max_retries:
+        if _can_reflect(state):
             return "reflector"
         return "kraj"
     return "presenter"
@@ -94,7 +104,10 @@ graph = _build()
 
 
 def answer(question):
+    metrics.reset()
+    start = time.perf_counter()
     final = graph.invoke({"question": question, "trace": []})
+    elapsed_ms = int((time.perf_counter() - start) * 1000)
     error = (
         final.get("error")
         or final.get("validation_error")
@@ -107,8 +120,11 @@ def answer(question):
         "sql": final.get("sql", ""),
         "columns": final.get("columns", []),
         "rows": final.get("rows", []),
+        "answered": final.get("answered", True),
         "error": error,
         "retry_count": final.get("retry_count", 0),
+        "llm_calls": metrics.counter.llm_calls,
+        "elapsed_ms": elapsed_ms,
         "trace": final.get("trace", []),
     }
 

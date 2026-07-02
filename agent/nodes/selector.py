@@ -1,3 +1,4 @@
+from agent import ablation
 from agent.llm import get_llm
 
 SYSTEM = (
@@ -22,6 +23,10 @@ def _looks_like_followup(question):
 def selector_node(state):
     question = state["question"]
     history = state.get("history", [])
+
+    if not ablation.current.use_selector:
+        trace = state.get("trace", []) + [{"node": "selector", "info": "iskljucen"}]
+        return {"goal": question, "trace": trace}
 
     if not history or not _looks_like_followup(question):
         trace = state.get("trace", []) + [

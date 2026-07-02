@@ -14,6 +14,7 @@ class AgentState(TypedDict, total=False):
     columns: list[str]
     rows: list[list[Any]]
     summary: str
+    answered: bool
     error: str
     retry_count: int
     trace: list[dict]
