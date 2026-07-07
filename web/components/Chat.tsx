@@ -9,10 +9,10 @@ type Msg = { role: "user"; text: string } | { role: "ai"; result: AskResult };
 const STORAGE_KEY = "t2s_chat";
 
 const DEFAULT_EXAMPLES = [
-  "Koja tri proizvoda su najskuplja?",
-  "Koliko narudžbina ima?",
-  "Koliko narudžbina je od kupaca iz Beograda?",
-  "Koja kategorija ima najviše proizvoda?",
+  "Koliko filmova ima u bazi?",
+  "Koji glumac glumi u najviše filmova?",
+  "Kojih pet filmova je najduže?",
+  "Koja kategorija ima najviše filmova?",
 ];
 
 export default function Chat() {
@@ -21,7 +21,7 @@ export default function Chat() {
   const [loading, setLoading] = useState(false);
   const [examples, setExamples] = useState<string[]>(DEFAULT_EXAMPLES);
   const endRef = useRef<HTMLDivElement>(null);
-  const loaded = useRef(false);
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     getSuggestions().then((s) => {
@@ -38,14 +38,13 @@ export default function Chat() {
         /* ignore */
       }
     }
-    loaded.current = true;
+    setHydrated(true);
   }, []);
 
   useEffect(() => {
-    if (loaded.current) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
-    }
-  }, [messages]);
+    if (!hydrated) return;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+  }, [messages, hydrated]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });

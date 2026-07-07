@@ -135,7 +135,7 @@ if __name__ == "__main__":
     from tabulate import tabulate
 
     sys.stdout.reconfigure(encoding="utf-8")
-    question = sys.argv[1] if len(sys.argv) > 1 else "Koja tri proizvoda su najskuplja?"
+    question = sys.argv[1] if len(sys.argv) > 1 else "Kojih pet filmova je najduze?"
     out = answer(question)
     print("Odgovor:", out["summary"])
     print("\nSQL:")

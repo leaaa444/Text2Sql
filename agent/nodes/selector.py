@@ -7,9 +7,9 @@ SYSTEM = (
     "follow-up refers to. Answer in the same language. Return only the rewritten "
     "question.\n\n"
     "Example:\n"
-    "Previous: Koliko narudzbina ima?\n"
-    "Follow-up: a samo iz Beograda?\n"
-    "Rewritten: Koliko narudzbina je od kupaca iz Beograda?"
+    "Previous: Koliko filmova ima?\n"
+    "Follow-up: a samo iz 2006. godine?\n"
+    "Rewritten: Koliko filmova je iz 2006. godine?"
 )
 
 _FOLLOWUP_MARKERS = ("a ", "i ", "ali ", "samo ")
