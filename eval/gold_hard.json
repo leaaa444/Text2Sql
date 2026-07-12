@@ -1,0 +1,62 @@
+[
+  {
+    "id": "hard_1",
+    "category": "having",
+    "question": "Koji glumci se pojavljuju u vise od 35 filmova? Prikazi ime, prezime i broj filmova.",
+    "gold_sql": "SELECT a.first_name, a.last_name, COUNT(*) AS broj FROM actor a JOIN film_actor fa ON fa.actor_id = a.actor_id GROUP BY a.actor_id, a.first_name, a.last_name HAVING COUNT(*) > 35 ORDER BY broj DESC, a.last_name"
+  },
+  {
+    "id": "hard_2",
+    "category": "join5",
+    "question": "Koja kategorija filmova donosi najveci ukupan prihod od placanja?",
+    "gold_sql": "SELECT c.name, SUM(p.amount) AS prihod FROM category c JOIN film_category fc ON fc.category_id = c.category_id JOIN inventory i ON i.film_id = fc.film_id JOIN rental r ON r.inventory_id = i.inventory_id JOIN payment p ON p.rental_id = r.rental_id GROUP BY c.name ORDER BY prihod DESC LIMIT 1"
+  },
+  {
+    "id": "hard_3",
+    "category": "subquery",
+    "question": "Koliko kupaca je potrosilo vise od prosecne potrosnje po kupcu?",
+    "gold_sql": "SELECT COUNT(*) FROM (SELECT customer_id, SUM(amount) AS s FROM payment GROUP BY customer_id HAVING SUM(amount) > (SELECT AVG(t.s) FROM (SELECT SUM(amount) AS s FROM payment GROUP BY customer_id) t)) q"
+  },
+  {
+    "id": "hard_4",
+    "category": "join4",
+    "question": "Koji glumac se pojavljuje u najvise filmova kategorije 'Sports'? Prikazi ime, prezime i broj.",
+    "gold_sql": "SELECT a.first_name, a.last_name, COUNT(*) AS broj FROM actor a JOIN film_actor fa ON fa.actor_id = a.actor_id JOIN film_category fc ON fc.film_id = fa.film_id JOIN category c ON c.category_id = fc.category_id WHERE c.name = 'Sports' GROUP BY a.actor_id, a.first_name, a.last_name ORDER BY broj DESC LIMIT 1"
+  },
+  {
+    "id": "hard_5",
+    "category": "having",
+    "question": "U kojim gradovima zivi vise od jednog kupca? Prikazi grad i broj kupaca.",
+    "gold_sql": "SELECT ci.city, COUNT(*) AS broj FROM customer cu JOIN address a ON a.address_id = cu.address_id JOIN city ci ON ci.city_id = a.city_id GROUP BY ci.city HAVING COUNT(*) > 1 ORDER BY broj DESC, ci.city"
+  },
+  {
+    "id": "hard_6",
+    "category": "subquery",
+    "question": "Koliko filmova nikada nije iznajmljeno?",
+    "gold_sql": "SELECT COUNT(*) FROM film f WHERE f.film_id NOT IN (SELECT i.film_id FROM inventory i JOIN rental r ON r.inventory_id = i.inventory_id)"
+  },
+  {
+    "id": "hard_7",
+    "category": "subquery",
+    "question": "Koje kategorije imaju prosecnu duzinu filma vecu od ukupne prosecne duzine svih filmova? Prikazi kategoriju i prosecnu duzinu.",
+    "gold_sql": "SELECT c.name, AVG(f.length) AS prosek FROM category c JOIN film_category fc ON fc.category_id = c.category_id JOIN film f ON f.film_id = fc.film_id GROUP BY c.name HAVING AVG(f.length) > (SELECT AVG(length) FROM film) ORDER BY prosek DESC"
+  },
+  {
+    "id": "hard_8",
+    "category": "join5",
+    "question": "Iz koje drzave dolazi kupac koji je potrosio najvise novca? Prikazi drzavu.",
+    "gold_sql": "SELECT co.country FROM customer cu JOIN payment p ON p.customer_id = cu.customer_id JOIN address a ON a.address_id = cu.address_id JOIN city ci ON ci.city_id = a.city_id JOIN country co ON co.country_id = ci.country_id GROUP BY cu.customer_id, co.country ORDER BY SUM(p.amount) DESC LIMIT 1"
+  },
+  {
+    "id": "hard_9",
+    "category": "groupby",
+    "question": "Za svaku ocenu (rating), koliko filmova je duze od 120 minuta? Prikazi ocenu i broj.",
+    "gold_sql": "SELECT rating, COUNT(*) AS broj FROM film WHERE length > 120 GROUP BY rating ORDER BY rating"
+  },
+  {
+    "id": "hard_10",
+    "category": "subquery",
+    "question": "Koliko filmova se nalazi u inventaru obe prodavnice?",
+    "gold_sql": "SELECT COUNT(*) FROM (SELECT film_id FROM inventory WHERE store_id = 1 INTERSECT SELECT film_id FROM inventory WHERE store_id = 2) q"
+  }
+]

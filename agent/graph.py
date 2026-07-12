@@ -108,12 +108,17 @@ def answer(question):
     start = time.perf_counter()
     final = graph.invoke({"question": question, "trace": []})
     elapsed_ms = int((time.perf_counter() - start) * 1000)
-    error = (
-        final.get("error")
-        or final.get("validation_error")
-        or final.get("guard_error")
-        or final.get("scope_error")
-    )
+    if final.get("scope_error"):
+        error = final["scope_error"]
+    elif final.get("guard_error"):
+        error = final["guard_error"]
+    elif final.get("error") or final.get("validation_error"):
+        error = (
+            "Nisam uspeo da sastavim ispravan upit za ovo pitanje. "
+            "Pokušaj da ga preformulišeš jasnije ili jednostavnije."
+        )
+    else:
+        error = None
     return {
         "summary": final.get("summary", ""),
         "plan": final.get("plan", []),

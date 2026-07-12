@@ -56,4 +56,16 @@ def get_llm(provider=None, model=None):
             rate_limiter=_rate_limiter(),
             callbacks=[metrics.counter],
         )
+    if provider == "openrouter":
+        from langchain_openai import ChatOpenAI
+
+        return ChatOpenAI(
+            model=model or settings.openrouter_model,
+            base_url="https://openrouter.ai/api/v1",
+            api_key=settings.openrouter_api_key,
+            temperature=0,
+            max_retries=6,
+            rate_limiter=_rate_limiter(),
+            callbacks=[metrics.counter],
+        )
     raise ValueError(f"Nepoznat LLM provajder: {provider}")

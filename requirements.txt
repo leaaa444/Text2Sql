@@ -3,6 +3,7 @@ langchain-core
 langchain-anthropic
 langchain-google-genai
 langchain-groq
+langchain-openai
 psycopg[binary]
 sqlglot
 python-dotenv

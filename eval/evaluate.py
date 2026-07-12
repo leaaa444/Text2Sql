@@ -1,13 +1,14 @@
 import json
+import os
 import time
 from decimal import Decimal
 
 from agent import graph, memory
 from agent.db.connection import run_query
 
-GOLD_PATH = "eval/gold_set.json"
-ATTACKS_PATH = "eval/attacks.json"
-RESULTS_PATH = "eval/results_baseline.json"
+GOLD_PATH = os.getenv("GOLD_PATH", "eval/gold_set.json")
+ATTACKS_PATH = os.getenv("ATTACKS_PATH", "eval/attacks.json")
+RESULTS_PATH = os.getenv("BASELINE_PATH", "eval/results_baseline.json")
 
 
 def _load(path):

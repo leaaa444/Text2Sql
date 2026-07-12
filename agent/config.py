@@ -15,6 +15,8 @@ class Settings:
     anthropic_model: str = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-6")
     gemini_model: str = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
     groq_model: str = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+    openrouter_model: str = os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini")
+    openrouter_api_key: str = os.getenv("OPENROUTER_API_KEY", "")
     db_host: str = os.getenv("DB_HOST", "localhost")
     db_port: int = int(os.getenv("DB_PORT", "5432"))
     db_name: str = os.getenv("DB_NAME", "text2sql")

@@ -1,6 +1,6 @@
 # Primer kompletnog traga (trace) kroz agentni graf
 
-**Pitanje:** Koji glumac glumi u najvise filmova?
+**Pitanje:** Koliko filmova je u kategoriji 'Comedy'?
 
 ## Koraci kroz cvorove
 
@@ -10,7 +10,7 @@
 | 2 | `retriever` | ucitana sema baze |
 | 3 | `scope` | u temi |
 | 4 | `selector` | samostalno pitanje, bez izmene |
-| 5 | `planner` | 4 korak(a) |
+| 5 | `planner` | 3 korak(a) |
 | 6 | `deliberator` | generisan SQL (2 primera) |
 | 7 | `integrator` | validan |
 | 8 | `guard` | bezbedan, +LIMIT |
@@ -20,30 +20,27 @@
 
 ## Plan (Planner)
 
-1. Izvuci sve kolone iz tabele film_actor.
-2. Izvuci sve kolone iz tabele actor.
-3. Grupišite rezultate po actor_id iz tabele actor i broji film_id iz tabele film_actor za svakog glumca.
-4. Redite rezultate po broju filmova u opadajućem poretku i uzimanjem samo prvih redova.
+1. Identificirati ID kategorije 'Comedy' iz tabele category.
+2. Pronaći sve filmove koji pripadaju toj kategoriji koristeći tabelu film_category.
+3. Prebrojati broj filmova koji su pronađeni u prethodnom koraku.
 
 ## Generisani SQL (Deliberator, posle Guard-a)
 
 ```sql
 SELECT
-  a.first_name,
-  a.last_name,
-  COUNT(fa.film_id)
-FROM actor AS a
-JOIN film_actor AS fa
-  ON a.actor_id = fa.actor_id
-GROUP BY
-  a.actor_id
-ORDER BY
-  COUNT(fa.film_id) DESC
-LIMIT 1
+  COUNT(*)
+FROM film AS f
+JOIN film_category AS fc
+  ON f.film_id = fc.film_id
+JOIN category AS c
+  ON fc.category_id = c.category_id
+WHERE
+  c.name = 'Comedy'
+LIMIT 100
 ```
 
 ## Rezultat
 
-**Odgovor (Presenter):** Gina Degeneres glumi u najvise filmova sa 42 filmova.
+**Odgovor (Presenter):** U kategoriji 'Comedy' ima 143 filma.
 
-**Broj LLM poziva:** 4 · **Vreme:** 12.1 s · **Samoispravljanja:** 0
+**Broj LLM poziva:** 4 · **Vreme:** 11.2 s · **Samoispravljanja:** 0

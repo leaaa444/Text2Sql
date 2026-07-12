@@ -21,7 +21,7 @@ CONFIGS = [
     ("bez svega", AblationConfig.baseline(), True, True),
 ]
 
-RESULTS_PATH = "eval/results_ablation.json"
+RESULTS_PATH = os.getenv("ABLATION_PATH", "eval/results_ablation.json")
 
 
 def main():
