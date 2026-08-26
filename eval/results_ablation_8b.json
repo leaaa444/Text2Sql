@@ -1,0 +1,47 @@
+[
+  {
+    "config": "Pun sistem",
+    "ex_ok": 17,
+    "ex_n": 24
+  },
+  {
+    "config": "bez Retriever",
+    "ex_ok": 18,
+    "ex_n": 24
+  },
+  {
+    "config": "bez Selector",
+    "ex_ok": 17,
+    "ex_n": 24
+  },
+  {
+    "config": "bez Planner",
+    "ex_ok": 14,
+    "ex_n": 24
+  },
+  {
+    "config": "bez Integrator",
+    "ex_ok": 20,
+    "ex_n": 24
+  },
+  {
+    "config": "bez Reflector",
+    "ex_ok": 19,
+    "ex_n": 24
+  },
+  {
+    "config": "bez Recorder",
+    "ex_ok": 19,
+    "ex_n": 24
+  },
+  {
+    "config": "bez Skill-build",
+    "ex_ok": 20,
+    "ex_n": 24
+  },
+  {
+    "config": "bez svega",
+    "ex_ok": 2,
+    "ex_n": 24
+  }
+]

@@ -44,6 +44,5 @@ Thumbs.db
 *.tmp
 *.bak
 
-# Interni dokumenti (za sada van gita)
+# Interni dokumenti (van gita)
 PLAN.md
-README.md

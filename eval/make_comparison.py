@@ -14,28 +14,21 @@ CONFIGS = [
     "bez Integrator", "bez Reflector", "bez Recorder", "bez Skill-build", "bez svega",
 ]
 
-# 8b (llama-3.1-8b-instant) EX u procentima
-EX_8B = {
-    "Pun sistem": 70.8, "bez Retriever": 75.0, "bez Selector": 70.8, "bez Planner": 58.3,
-    "bez Integrator": 83.3, "bez Reflector": 79.2, "bez Recorder": 79.2,
-    "bez Skill-build": 83.3, "bez svega": 8.3,
-}
+PATH_8B = "eval/results_ablation_8b.json"
+PATH_4O = "eval/results_ablation.json"
 
 
-def load_4o():
-    with open("eval/results_ablation.json", encoding="utf-8") as f:
+def load_ex(path):
+    with open(path, encoding="utf-8") as f:
         rows = json.load(f)
-    out = {}
-    for r in rows:
-        if "ex_n" in r:
-            out[r["config"]] = 100 * r["ex_ok"] / r["ex_n"]
-    return out
+    return {r["config"]: 100 * r["ex_ok"] / r["ex_n"] for r in rows if "ex_n" in r}
 
 
 def main():
-    ex_4o = load_4o()
+    ex_8b = load_ex(PATH_8B)
+    ex_4o = load_ex(PATH_4O)
     labels = CONFIGS
-    a = [EX_8B[c] for c in labels]
+    a = [ex_8b[c] for c in labels]
     b = [ex_4o.get(c, 0) for c in labels]
 
     x = np.arange(len(labels))
