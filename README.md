@@ -27,8 +27,8 @@ flowchart TD
     C -->|van teme| K["recorder_save"]
     C -->|u temi| D["selector<br/>izbor tabela"]
     D --> E["planner<br/>plan u koracima"]
-    E --> F["deliberator<br/>preispitivanje plana"]
-    F --> G["integrator<br/>sastavljanje SQL-a"]
+    E --> F["deliberator<br/>sastavljanje SQL-a"]
+    F --> G["integrator<br/>provera upita nad šemom"]
     G -->|upit neispravan| R["reflector<br/>samoispravljanje"]
     R --> G
     G --> H{"guard<br/>samo SELECT + LIMIT"}
