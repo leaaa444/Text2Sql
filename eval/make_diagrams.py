@@ -153,23 +153,22 @@ def slika33_grupisanje():
 def slika34_bezbednost():
     fig, ax = new_ax(10, 4.4)
     steps = [
-        (20, "Provera teme\n(ulazna kapija)"),
-        (42, "Provera ispravnosti\nupita (šema)"),
-        (64, "Bezbednosna kontrola\n(samo SELECT, LIMIT)"),
-        (86, "Nalog samo za čitanje\n(nivo baze)"),
+        (24, "Provera teme\n(ulazna kapija)"),
+        (53, "Bezbednosna kontrola\n(samo SELECT, LIMIT)"),
+        (82, "Nalog samo za čitanje\n(nivo baze)"),
     ]
     ax.text(5, 80, "pitanje /\nnapad", ha="center", fontsize=11, color=RED, fontweight="bold")
     for i, (x, t) in enumerate(steps):
-        box(ax, x, 62, 19, 26, t, fs=10.5, fill=SOFT if i < 3 else TEAL_SOFT,
-            edge=SLATE if i < 3 else TEAL)
-        start = (2, 62) if i == 0 else (steps[i - 1][0] + 10, 62)
-        arrow(ax, start, (x - 10, 62), curve=0)
-        rx = x - 4 if i == 3 else x
+        box(ax, x, 62, 22, 26, t, fs=10.5, fill=SOFT if i < 2 else TEAL_SOFT,
+            edge=SLATE if i < 2 else TEAL)
+        start = (2, 62) if i == 0 else (steps[i - 1][0] + 12, 62)
+        arrow(ax, start, (x - 12, 62), curve=0)
+        rx = x - 5 if i == 2 else x
         ax.text(rx, 40, "✗ odbijanje", ha="center", fontsize=10, color=RED)
         arrow(ax, (rx, 48), (rx, 34), color=RED, lw=1.2)
     box(ax, 50, 14, 38, 13, "Prikrivanje ličnih podataka na izlazu (maskiranje)", fs=11)
-    arrow(ax, (92, 48), (92, 21), curve=0, label="rezultat", lx=5, ly=8)
-    arrow(ax, (92, 17), (70, 14.5), curve=0.05)
+    arrow(ax, (90, 48), (90, 21), curve=0, label="rezultat", lx=5, ly=8)
+    arrow(ax, (90, 17), (70, 14.5), curve=0.05)
     arrow(ax, (30, 14), (8, 14), label="odgovor", lx=0, ly=5)
     save(fig, "slika34_bezbednost.png")
 

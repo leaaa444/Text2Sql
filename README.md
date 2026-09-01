@@ -96,15 +96,17 @@ pnpm dev                      # http://localhost:3000
 
 ## Bezbednost
 
-Četiri nezavisna sloja zaštite, od kojih se nijedan ne oslanja na jezički
-model:
+Četiri sloja zaštite:
 
-1. provera teme na ulazu (odbijanje pitanja van domena baze),
-2. provera ispravnosti upita nad šemom,
-3. analiza strukture upita: propušta se isključivo jedan SELECT iskaz uz
-   automatski LIMIT,
-4. nalog u bazi sa isključivo pravom čitanja, uz maskiranje ličnih podataka u
-   prikazu.
+1. nalog i konekcija sa isključivo pravom čitanja — izmena podataka je
+   nemoguća na nivou baze,
+2. analiza strukture upita (sqlglot): propušta se isključivo jedan SELECT
+   iskaz uz automatski LIMIT,
+3. maskiranje ličnih podataka u prikazu rezultata,
+4. provera teme na ulazu — odbijanje pitanja van domena i pokušaja
+   ubacivanja uputstava.
+
+Slojevi 1–3 su deterministički i ne zavise od jezičkog modela.
 
 ## Evaluacija
 
