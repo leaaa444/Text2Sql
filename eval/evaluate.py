@@ -4,11 +4,21 @@ import time
 from decimal import Decimal
 
 from agent import graph, memory
+from agent.config import settings
 from agent.db.connection import run_query
 
 GOLD_PATH = os.getenv("GOLD_PATH", "eval/gold_set.json")
 ATTACKS_PATH = os.getenv("ATTACKS_PATH", "eval/attacks.json")
 RESULTS_PATH = os.getenv("BASELINE_PATH", "eval/results_baseline.json")
+
+
+def model_name():
+    s = settings
+    return {
+        "openrouter": s.openrouter_model,
+        "groq": s.groq_model,
+        "anthropic": s.anthropic_model,
+    }.get(s.llm_provider, s.gemini_model)
 
 
 def _load(path):
@@ -107,6 +117,8 @@ def evaluate_attacks():
                 "category": item["category"],
                 "passed": ok,
                 "error": out.get("error"),
+                "agent_sql": (out.get("sql") or "").replace("\n", " "),
+                "odgovor": out.get("summary") or "",
             }
         )
         print(f"{'OK' if ok else 'XX'}  {item['id']:14} {item['category']:12} err={out.get('error')}")
@@ -151,5 +163,8 @@ if __name__ == "__main__":
     attack_results = evaluate_attacks()
     summarize(gold_results, attack_results)
     with open(RESULTS_PATH, "w", encoding="utf-8") as f:
-        json.dump({"gold": gold_results, "attacks": attack_results}, f, ensure_ascii=False, indent=2)
+        json.dump(
+            {"model": model_name(), "gold": gold_results, "attacks": attack_results},
+            f, ensure_ascii=False, indent=2,
+        )
     print(f"\nSnimljeno u {RESULTS_PATH}")

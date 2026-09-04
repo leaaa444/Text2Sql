@@ -1,27 +1,31 @@
 import json
 import os
 import sys
+from dataclasses import replace
 
 from agent import ablation, skills
 from agent.config import AblationConfig
 from eval import evaluate
 
+
+def samo(**kwargs):
+    return replace(AblationConfig.baseline(), **kwargs)
+
+
 CONFIGS = [
-    ("Pun sistem", AblationConfig(), True, True),
-    ("bez Retriever", AblationConfig(use_retriever=False), True, False),
-    ("bez Selector", AblationConfig(use_selector=False), True, False),
-    ("bez Planner", AblationConfig(use_planner=False), True, False),
-    ("bez Integrator", AblationConfig(use_integrator=False), True, True),
-    ("bez Reflector", AblationConfig(use_reflector=False), True, False),
-    ("bez Recorder", AblationConfig(use_recorder=False), True, False),
-    ("bez Skill-build", AblationConfig(use_skill_build=False), True, False),
-    ("bez Scope", AblationConfig(use_scope=False), False, True),
-    ("bez Guard", AblationConfig(use_security_guard=False), False, True),
-    ("bez Scope+Guard", AblationConfig(use_scope=False, use_security_guard=False), False, True),
-    ("bez svega", AblationConfig.baseline(), True, True),
+    ("Polazno resenje", AblationConfig.baseline(), True, True),
+    ("samo Retriever", samo(use_retriever=True), True, False),
+    ("samo Selector", samo(use_selector=True), True, False),
+    ("samo Planner", samo(use_planner=True), True, False),
+    ("samo Integrator", samo(use_integrator=True), True, False),
+    ("samo Reflector", samo(use_reflector=True, max_retries=2), True, False),
+    ("samo Recorder", samo(use_recorder=True), True, False),
+    ("samo Skill-build", samo(use_skill_build=True), True, False),
+    ("samo Scope", samo(use_scope=True), False, True),
+    ("samo Guard", samo(use_security_guard=True), False, True),
 ]
 
-RESULTS_PATH = os.getenv("ABLATION_PATH", "eval/results_ablation.json")
+RESULTS_PATH = os.getenv("ADDITIVE_PATH", "eval/results_ablation_additive.json")
 
 
 def main():
@@ -56,7 +60,7 @@ def main():
             json.dump(table, f, ensure_ascii=False, indent=2)
     ablation.reset()
 
-    print("\n=== ABLACIONA TABELA ===")
+    print("\n=== DODAVANJE PO JEDNOG PATERNA NA POLAZNO RESENJE ===")
     print(f"{'Konfiguracija':18} {'EX':>14} {'Bezbednost':>14}")
     for r in table:
         if "ex_n" in r:

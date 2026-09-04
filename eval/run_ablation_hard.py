@@ -2,9 +2,11 @@ import json
 import os
 import sys
 
-from agent import ablation
+from agent import ablation, skills
 from agent.config import AblationConfig
 from eval import evaluate
+
+evaluate.GOLD_PATH = os.getenv("GOLD_PATH", "eval/gold_hard.json")
 
 CONFIGS = [
     ("Pun sistem", AblationConfig()),
@@ -33,10 +35,17 @@ def main():
         if name in done:
             print("preskacem (vec uradjeno):", name)
             continue
+        skills.reset()
         ablation.set_config(cfg)
         print(f"\n########## {name} ##########")
         gold = evaluate.evaluate_gold()
-        row = {"config": name, "ex_ok": sum(1 for r in gold if r["match"]), "ex_n": len(gold)}
+        row = {
+            "config": name,
+            "model": evaluate.model_name(),
+            "ex_ok": sum(1 for r in gold if r["match"]),
+            "ex_n": len(gold),
+            "pitanja": gold,
+        }
         table.append(row)
         with open(OUT, "w", encoding="utf-8") as f:
             json.dump(table, f, ensure_ascii=False, indent=2)

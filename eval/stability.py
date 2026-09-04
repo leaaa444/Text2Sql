@@ -1,7 +1,7 @@
 import json
 import sys
 
-from agent import ablation
+from agent import ablation, skills
 from agent.config import AblationConfig
 from eval import evaluate
 
@@ -28,10 +28,13 @@ def main():
     ex_scores = []
     sec_scores = []
     n_gold = n_sec = 0
+    pokreti = []
     for i in range(REPEATS):
         print(f"\n===== POKRET {i + 1}/{REPEATS} =====")
+        skills.reset()
         gold = evaluate.evaluate_gold()
         attacks = evaluate.evaluate_attacks()
+        pokreti.append({"pokret": i + 1, "pitanja": gold, "napadi": attacks})
         n_gold = len(gold)
         n_sec = len(attacks)
         ex_scores.append(sum(1 for r in gold if r["match"]))
@@ -39,8 +42,10 @@ def main():
         print(f"Pokret {i + 1}: EX {ex_scores[-1]}/{n_gold}, Bezbednost {sec_scores[-1]}/{n_sec}")
         result = {
             "repeats": i + 1,
+            "model": evaluate.model_name(),
             "ex": _stats(ex_scores, n_gold),
             "sec": _stats(sec_scores, n_sec),
+            "pokreti": pokreti,
         }
         with open(RESULTS_PATH, "w", encoding="utf-8") as f:
             json.dump(result, f, ensure_ascii=False, indent=2)

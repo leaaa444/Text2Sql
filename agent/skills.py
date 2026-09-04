@@ -1,6 +1,6 @@
 import difflib
 
-_skills = [
+_SEEDS = [
     {
         "question": "Koliko ima filmova?",
         "sql": "SELECT COUNT(*) FROM film",
@@ -18,6 +18,7 @@ _skills = [
         ),
     },
 ]
+_skills = [dict(s) for s in _SEEDS]
 
 
 def _similarity(a, b):
@@ -40,3 +41,7 @@ def add(question, sql):
         if s["question"].strip().lower() == question.lower():
             return
     _skills.append({"question": question, "sql": sql})
+
+
+def reset():
+    _skills[:] = [dict(s) for s in _SEEDS]

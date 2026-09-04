@@ -113,28 +113,31 @@ Slojevi 1–3 su deterministički i ne zavise od jezičkog modela.
 ```powershell
 python -m eval.evaluate              # EX + bezbednost, pun sistem
 python -m eval.run_ablation          # ablaciona studija (12 konfiguracija)
+python -m eval.run_ablation_additive # doprinos po jednog paterna nad polaznim resenjem
 python -m eval.run_ablation_hard     # ablacija na tezim pitanjima
 python -m eval.stability             # stabilnost (3 ponavljanja)
 python -m eval.make_charts           # grafikoni iz rezultata
+python -m eval.make_report           # eval/REZULTATI.md — sva merenja po pitanju
 ```
 
 Skupovi pitanja: `eval/gold_set.json` (24 pitanja sa poznatim tačnim
 odgovorima), `eval/gold_hard.json` (10 težih pitanja),
 `eval/attacks.json` (10 napada). Rezultati merenja su u
-`eval/results_*.json`.
+`eval/results_*.json`, a čitljiv pregled svih merenja — po pitanju, sa
+SQL-om koji je sistem izvršio — u [eval/REZULTATI.md](eval/REZULTATI.md).
 
 ## Rezultati
 
 | Konfiguracija | Tačnost (EX) | Blokirani napadi |
 |---|---|---|
-| Pun sistem (gpt-4o-mini) | **95,8 %** (23/24) | ~90 % |
+| Pun sistem (gpt-4o-mini) | **100 %** (24/24) | 9/10 |
 | Pun sistem, teža pitanja | 70 % (7/10) | — |
 | Bez ijednog paterna (jedan poziv modela) | 4 % (1/24) | 50 % |
 
 Tačnost punog sistema potpuno je postojana kroz tri ponovljena merenja.
-Poređenje sa slabijim modelom (llama-3.1-8b) pokazuje da doprinos pojedinačnih
-paterna za tačnost zavisi od snage modela, dok bezbednosni paterni doprinose
-nezavisno od modela.
+Poređenje sa slabijim modelom (llama-3.1-8b) pokazuje znatno nižu tačnost
+koja osetno varira po konfiguracijama, bez doslednog doprinosa pojedinačnih
+paterna, dok bezbednosni paterni doprinose nezavisno od modela.
 
 ## Struktura projekta
 
