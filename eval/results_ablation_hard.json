@@ -11,7 +11,7 @@
         "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 10911,
+        "elapsed_ms": 10648,
         "retry_count": 0,
         "agent_sql": "SELECT   a.first_name,   a.last_name,   COUNT(fa.film_id) AS film_count FROM actor AS a JOIN film_actor AS fa   ON a.actor_id = fa.actor_id GROUP BY   a.actor_id HAVING   COUNT(fa.film_id) > 35 LIMIT 100"
       },
@@ -21,19 +21,19 @@
         "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 8852,
+        "elapsed_ms": 4849,
         "retry_count": 0,
         "agent_sql": "SELECT   c.name,   SUM(p.amount) AS total_revenue FROM category AS c JOIN film_category AS fc   ON c.category_id = fc.category_id JOIN film AS f   ON fc.film_id = f.film_id JOIN inventory AS i   ON f.film_id = i.film_id JOIN rental AS r   ON i.inventory_id = r.inventory_id JOIN payment AS p   ON r.rental_id = p.rental_id GROUP BY   c.category_id,   c.name ORDER BY   total_revenue DESC LIMIT 1"
       },
       {
         "id": "hard_3",
         "category": "subquery",
-        "match": true,
+        "match": false,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 6281,
+        "elapsed_ms": 6231,
         "retry_count": 0,
-        "agent_sql": "SELECT   COUNT(*) FROM (   SELECT     customer_id,     SUM(amount) AS total_spent   FROM payment   GROUP BY     customer_id ) AS customer_spending WHERE   total_spent > (     SELECT       AVG(total)     FROM (       SELECT         SUM(amount) AS total       FROM payment       GROUP BY         customer_id     ) AS avg_spending   ) LIMIT 100"
+        "agent_sql": "SELECT   COUNT(DISTINCT c.customer_id) FROM customer AS c JOIN payment AS p   ON c.customer_id = p.customer_id GROUP BY   c.customer_id HAVING   SUM(p.amount) > (     SELECT       AVG(total_spent)     FROM (       SELECT         SUM(amount) AS total_spent       FROM payment       GROUP BY         customer_id     ) AS avg_spending   ) LIMIT 100"
       },
       {
         "id": "hard_4",
@@ -41,7 +41,7 @@
         "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 9020,
+        "elapsed_ms": 6584,
         "retry_count": 0,
         "agent_sql": "SELECT   a.first_name,   a.last_name,   COUNT(fa.film_id) AS film_count FROM actor AS a JOIN film_actor AS fa   ON a.actor_id = fa.actor_id JOIN film_category AS fc   ON fa.film_id = fc.film_id JOIN category AS c   ON fc.category_id = c.category_id WHERE   c.name = 'Sports' GROUP BY   a.actor_id ORDER BY   film_count DESC LIMIT 1"
       },
@@ -51,7 +51,7 @@
         "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 7224,
+        "elapsed_ms": 4922,
         "retry_count": 0,
         "agent_sql": "SELECT   c.city,   COUNT(cs.customer_id) AS customer_count FROM customer AS cs JOIN address AS a   ON cs.address_id = a.address_id JOIN city AS c   ON a.city_id = c.city_id GROUP BY   c.city HAVING   COUNT(cs.customer_id) > 1 LIMIT 100"
       },
@@ -61,7 +61,7 @@
         "match": false,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 5613,
+        "elapsed_ms": 6883,
         "retry_count": 0,
         "agent_sql": "SELECT   COUNT(*) FROM film WHERE   NOT film_id IN (     SELECT DISTINCT       film_id     FROM rental   ) LIMIT 100"
       },
@@ -71,7 +71,7 @@
         "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 7526,
+        "elapsed_ms": 5254,
         "retry_count": 0,
         "agent_sql": "SELECT   c.name AS category,   AVG(f.length) AS average_length FROM film AS f JOIN film_category AS fc   ON f.film_id = fc.film_id JOIN category AS c   ON fc.category_id = c.category_id GROUP BY   c.category_id HAVING   AVG(f.length) > (     SELECT       AVG(length)     FROM film   ) LIMIT 100"
       },
@@ -81,9 +81,9 @@
         "match": false,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 7711,
+        "elapsed_ms": 6006,
         "retry_count": 0,
-        "agent_sql": "SELECT   co.country FROM customer AS cu JOIN payment AS p   ON cu.customer_id = p.customer_id JOIN address AS a   ON cu.address_id = a.address_id JOIN city AS ci   ON a.city_id = ci.city_id JOIN country AS co   ON ci.country_id = co.country_id GROUP BY   co.country ORDER BY   SUM(p.amount) DESC LIMIT 1"
+        "agent_sql": "SELECT   co.country FROM customer AS c JOIN address AS a   ON c.address_id = a.address_id JOIN city AS ci   ON a.city_id = ci.city_id JOIN country AS co   ON ci.country_id = co.country_id JOIN payment AS p   ON c.customer_id = p.customer_id GROUP BY   co.country ORDER BY   SUM(p.amount) DESC LIMIT 1"
       },
       {
         "id": "hard_9",
@@ -91,26 +91,26 @@
         "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 7509,
+        "elapsed_ms": 5906,
         "retry_count": 0,
-        "agent_sql": "SELECT   f.rating,   COUNT(f.film_id) AS film_count FROM film AS f WHERE   f.length > 120 GROUP BY   f.rating LIMIT 100"
+        "agent_sql": "SELECT   f.rating,   COUNT(f.film_id) AS film_count FROM film AS f WHERE   f.length > 120 GROUP BY   f.rating ORDER BY   f.rating LIMIT 100"
       },
       {
         "id": "hard_10",
         "category": "subquery",
-        "match": false,
+        "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 6797,
+        "elapsed_ms": 4491,
         "retry_count": 0,
-        "agent_sql": "SELECT   i.film_id,   COUNT(i.store_id) AS store_count FROM inventory AS i GROUP BY   i.film_id HAVING   COUNT(i.store_id) = 2 LIMIT 100"
+        "agent_sql": "SELECT   COUNT(film_id) AS total_films FROM (   SELECT     film_id   FROM inventory   GROUP BY     film_id   HAVING     COUNT(DISTINCT store_id) = 2 ) AS subquery LIMIT 100"
       }
     ]
   },
   {
     "config": "bez Retriever",
     "model": "openai/gpt-4o-mini",
-    "ex_ok": 6,
+    "ex_ok": 7,
     "ex_n": 10,
     "pitanja": [
       {
@@ -119,7 +119,7 @@
         "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 9225,
+        "elapsed_ms": 7033,
         "retry_count": 0,
         "agent_sql": "SELECT   a.first_name,   a.last_name,   COUNT(fa.film_id) AS film_count FROM actor AS a JOIN film_actor AS fa   ON a.actor_id = fa.actor_id GROUP BY   a.actor_id HAVING   COUNT(fa.film_id) > 35 LIMIT 100"
       },
@@ -129,7 +129,7 @@
         "match": true,
         "error": null,
         "llm_calls": 5,
-        "elapsed_ms": 7780,
+        "elapsed_ms": 8567,
         "retry_count": 1,
         "agent_sql": "SELECT   c.name,   SUM(p.amount) AS total_revenue FROM category AS c JOIN film_category AS fc   ON c.category_id = fc.category_id JOIN film AS f   ON fc.film_id = f.film_id JOIN inventory AS i   ON f.film_id = i.film_id JOIN rental AS r   ON i.inventory_id = r.inventory_id JOIN payment AS p   ON r.rental_id = p.rental_id GROUP BY   c.category_id,   c.name ORDER BY   total_revenue DESC LIMIT 1"
       },
@@ -139,9 +139,9 @@
         "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 6889,
+        "elapsed_ms": 5459,
         "retry_count": 0,
-        "agent_sql": "SELECT   COUNT(*) FROM (   SELECT     customer_id,     SUM(amount) AS total_spent   FROM payment   GROUP BY     customer_id ) AS customer_totals WHERE   total_spent > (     SELECT       AVG(total)     FROM (       SELECT         SUM(amount) AS total       FROM payment       GROUP BY         customer_id     ) AS avg_totals   ) LIMIT 100"
+        "agent_sql": "SELECT   COUNT(*) FROM (   SELECT     customer_id   FROM payment   GROUP BY     customer_id   HAVING     SUM(amount) > (       SELECT         AVG(total_spent)       FROM (         SELECT           SUM(amount) AS total_spent         FROM payment         GROUP BY           customer_id       ) AS avg_spending     ) ) AS high_spenders LIMIT 100"
       },
       {
         "id": "hard_4",
@@ -149,7 +149,7 @@
         "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 10414,
+        "elapsed_ms": 6820,
         "retry_count": 0,
         "agent_sql": "SELECT   a.first_name,   a.last_name,   COUNT(fa.film_id) AS film_count FROM actor AS a JOIN film_actor AS fa   ON a.actor_id = fa.actor_id JOIN film_category AS fc   ON fa.film_id = fc.film_id JOIN category AS c   ON fc.category_id = c.category_id WHERE   c.name = 'Sports' GROUP BY   a.actor_id ORDER BY   film_count DESC LIMIT 1"
       },
@@ -159,7 +159,7 @@
         "match": false,
         "error": "Nisam uspeo da sastavim ispravan upit za ovo pitanje. Pokušaj da ga preformulišeš jasnije ili jednostavnije.",
         "llm_calls": 5,
-        "elapsed_ms": 10650,
+        "elapsed_ms": 9049,
         "retry_count": 2,
         "agent_sql": "SELECT   a.city,   COUNT(c.customer_id) AS customer_count FROM customer AS c JOIN address AS a   ON c.address_id = a.address_id GROUP BY   a.city HAVING   COUNT(c.customer_id) > 1 LIMIT 100"
       },
@@ -169,7 +169,7 @@
         "match": false,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 5446,
+        "elapsed_ms": 6171,
         "retry_count": 0,
         "agent_sql": "SELECT   COUNT(*) FROM film WHERE   NOT film_id IN (     SELECT DISTINCT       film_id     FROM rental   ) LIMIT 100"
       },
@@ -179,19 +179,19 @@
         "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 8437,
+        "elapsed_ms": 6853,
         "retry_count": 0,
         "agent_sql": "SELECT   c.name AS category,   AVG(f.length) AS average_length FROM film AS f JOIN film_category AS fc   ON f.film_id = fc.film_id JOIN category AS c   ON fc.category_id = c.category_id GROUP BY   c.category_id HAVING   AVG(f.length) > (     SELECT       AVG(length)     FROM film   ) LIMIT 100"
       },
       {
         "id": "hard_8",
         "category": "join5",
-        "match": false,
-        "error": "Nisam uspeo da sastavim ispravan upit za ovo pitanje. Pokušaj da ga preformulišeš jasnije ili jednostavnije.",
+        "match": true,
+        "error": null,
         "llm_calls": 5,
-        "elapsed_ms": 9898,
-        "retry_count": 2,
-        "agent_sql": "SELECT   a.country_id FROM customer AS c JOIN address AS a   ON c.address_id = a.address_id JOIN city AS ci   ON a.city_id = ci.city_id JOIN (   SELECT     customer_id,     SUM(amount) AS total_spent   FROM payment   GROUP BY     customer_id ) AS customer_totals   ON c.customer_id = customer_totals.customer_id ORDER BY   total_spent DESC LIMIT 1"
+        "elapsed_ms": 8922,
+        "retry_count": 1,
+        "agent_sql": "SELECT   co.country AS country FROM customer AS cu JOIN address AS a   ON cu.address_id = a.address_id JOIN city AS ci   ON a.city_id = ci.city_id JOIN country AS co   ON ci.country_id = co.country_id JOIN (   SELECT     customer_id,     SUM(amount) AS total_spent   FROM payment   GROUP BY     customer_id ) AS spending   ON cu.customer_id = spending.customer_id ORDER BY   spending.total_spent DESC LIMIT 1"
       },
       {
         "id": "hard_9",
@@ -199,9 +199,9 @@
         "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 6496,
+        "elapsed_ms": 5832,
         "retry_count": 0,
-        "agent_sql": "SELECT   rating,   COUNT(*) AS film_count FROM film WHERE   length > 120 GROUP BY   rating LIMIT 100"
+        "agent_sql": "SELECT   f.rating,   COUNT(f.film_id) AS film_count FROM film AS f WHERE   f.length > 120 GROUP BY   f.rating LIMIT 100"
       },
       {
         "id": "hard_10",
@@ -209,9 +209,9 @@
         "match": false,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 6946,
+        "elapsed_ms": 7978,
         "retry_count": 0,
-        "agent_sql": "SELECT   COUNT(DISTINCT i.film_id) AS total_films FROM inventory AS i JOIN store AS s   ON i.store_id = s.store_id WHERE   s.store_id IN (1, 2) /* assuming store_id 1 and 2 represent the two stores */ LIMIT 100"
+        "agent_sql": "SELECT   COUNT(DISTINCT i.film_id) FROM inventory AS i WHERE   i.store_id IN (1, 2) GROUP BY   i.film_id HAVING   COUNT(DISTINCT i.store_id) = 2 LIMIT 100"
       }
     ]
   },
@@ -227,7 +227,7 @@
         "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 6448,
+        "elapsed_ms": 6346,
         "retry_count": 0,
         "agent_sql": "SELECT   a.first_name,   a.last_name,   COUNT(fa.film_id) AS film_count FROM actor AS a JOIN film_actor AS fa   ON a.actor_id = fa.actor_id GROUP BY   a.actor_id HAVING   COUNT(fa.film_id) > 35 LIMIT 100"
       },
@@ -237,7 +237,7 @@
         "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 8919,
+        "elapsed_ms": 6468,
         "retry_count": 0,
         "agent_sql": "SELECT   c.name,   SUM(p.amount) AS total_revenue FROM category AS c JOIN film_category AS fc   ON c.category_id = fc.category_id JOIN film AS f   ON fc.film_id = f.film_id JOIN inventory AS i   ON f.film_id = i.film_id JOIN rental AS r   ON i.inventory_id = r.inventory_id JOIN payment AS p   ON r.rental_id = p.rental_id GROUP BY   c.category_id,   c.name ORDER BY   total_revenue DESC LIMIT 1"
       },
@@ -247,9 +247,9 @@
         "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 7847,
+        "elapsed_ms": 5724,
         "retry_count": 0,
-        "agent_sql": "SELECT   COUNT(*) FROM (   SELECT     customer_id,     SUM(amount) AS total_spent   FROM payment   GROUP BY     customer_id ) AS customer_spending WHERE   total_spent > (     SELECT       AVG(total)     FROM (       SELECT         SUM(amount) AS total       FROM payment       GROUP BY         customer_id     ) AS avg_spending   ) LIMIT 100"
+        "agent_sql": "SELECT   COUNT(*) FROM customer AS c WHERE   (     SELECT       AVG(total_spent)     FROM (       SELECT         customer_id,         SUM(amount) AS total_spent       FROM payment       GROUP BY         customer_id     ) AS avg_spending   ) < (     SELECT       SUM(amount)     FROM payment     WHERE       customer_id = c.customer_id   ) LIMIT 100"
       },
       {
         "id": "hard_4",
@@ -257,7 +257,7 @@
         "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 7534,
+        "elapsed_ms": 6559,
         "retry_count": 0,
         "agent_sql": "SELECT   a.first_name,   a.last_name,   COUNT(fa.film_id) AS film_count FROM actor AS a JOIN film_actor AS fa   ON a.actor_id = fa.actor_id JOIN film_category AS fc   ON fa.film_id = fc.film_id JOIN category AS c   ON fc.category_id = c.category_id WHERE   c.name = 'Sports' GROUP BY   a.actor_id ORDER BY   film_count DESC LIMIT 1"
       },
@@ -267,9 +267,9 @@
         "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 6307,
+        "elapsed_ms": 5988,
         "retry_count": 0,
-        "agent_sql": "SELECT   c.city,   COUNT(*) AS customer_count FROM customer AS cu JOIN address AS a   ON cu.address_id = a.address_id JOIN city AS c   ON a.city_id = c.city_id GROUP BY   c.city HAVING   COUNT(*) > 1 LIMIT 100"
+        "agent_sql": "SELECT   ci.city,   COUNT(c.customer_id) AS customer_count FROM customer AS c JOIN address AS a   ON c.address_id = a.address_id JOIN city AS ci   ON a.city_id = ci.city_id GROUP BY   ci.city HAVING   COUNT(c.customer_id) > 1 LIMIT 100"
       },
       {
         "id": "hard_6",
@@ -277,7 +277,7 @@
         "match": false,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 7145,
+        "elapsed_ms": 4978,
         "retry_count": 0,
         "agent_sql": "SELECT   COUNT(*) FROM film WHERE   NOT film_id IN (     SELECT DISTINCT       film_id     FROM rental   ) LIMIT 100"
       },
@@ -287,19 +287,19 @@
         "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 6237,
+        "elapsed_ms": 5522,
         "retry_count": 0,
         "agent_sql": "SELECT   c.name AS category,   AVG(f.length) AS average_length FROM film AS f JOIN film_category AS fc   ON f.film_id = fc.film_id JOIN category AS c   ON fc.category_id = c.category_id GROUP BY   c.category_id HAVING   AVG(f.length) > (     SELECT       AVG(length)     FROM film   ) LIMIT 100"
       },
       {
         "id": "hard_8",
         "category": "join5",
-        "match": true,
+        "match": false,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 10374,
+        "elapsed_ms": 6474,
         "retry_count": 0,
-        "agent_sql": "SELECT   co.country FROM (   SELECT     customer_id,     SUM(amount) AS total_spent   FROM payment   GROUP BY     customer_id   ORDER BY     total_spent DESC   LIMIT 1 ) AS max_spender JOIN customer AS cu   ON max_spender.customer_id = cu.customer_id JOIN address AS a   ON cu.address_id = a.address_id JOIN city AS ci   ON a.city_id = ci.city_id JOIN country AS co   ON ci.country_id = co.country_id LIMIT 1"
+        "agent_sql": "SELECT   co.country FROM customer AS c JOIN payment AS p   ON c.customer_id = p.customer_id JOIN address AS a   ON c.address_id = a.address_id JOIN city AS ci   ON a.city_id = ci.city_id JOIN country AS co   ON ci.country_id = co.country_id GROUP BY   co.country ORDER BY   SUM(p.amount) DESC LIMIT 1"
       },
       {
         "id": "hard_9",
@@ -307,19 +307,19 @@
         "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 5749,
+        "elapsed_ms": 5940,
         "retry_count": 0,
-        "agent_sql": "SELECT   f.rating,   COUNT(*) AS film_count FROM film AS f WHERE   f.length > 120 GROUP BY   f.rating LIMIT 100"
+        "agent_sql": "SELECT   f.rating,   COUNT(f.film_id) AS film_count FROM film AS f WHERE   f.length > 120 GROUP BY   f.rating ORDER BY   f.rating LIMIT 100"
       },
       {
         "id": "hard_10",
         "category": "subquery",
-        "match": false,
+        "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 7298,
+        "elapsed_ms": 5935,
         "retry_count": 0,
-        "agent_sql": "SELECT   i.film_id,   COUNT(i.store_id) AS store_count FROM inventory AS i GROUP BY   i.film_id HAVING   COUNT(i.store_id) = 2 LIMIT 100"
+        "agent_sql": "SELECT   COUNT(*) FROM (   SELECT     film_id   FROM inventory   GROUP BY     film_id   HAVING     COUNT(DISTINCT store_id) = 2 ) AS films_in_both_stores LIMIT 100"
       }
     ]
   },
@@ -335,7 +335,7 @@
         "match": true,
         "error": null,
         "llm_calls": 3,
-        "elapsed_ms": 5975,
+        "elapsed_ms": 4336,
         "retry_count": 0,
         "agent_sql": "SELECT   a.first_name,   a.last_name,   COUNT(fa.film_id) AS film_count FROM actor AS a JOIN film_actor AS fa   ON a.actor_id = fa.actor_id GROUP BY   a.actor_id HAVING   COUNT(fa.film_id) > 35 LIMIT 100"
       },
@@ -345,7 +345,7 @@
         "match": true,
         "error": null,
         "llm_calls": 3,
-        "elapsed_ms": 6335,
+        "elapsed_ms": 5705,
         "retry_count": 0,
         "agent_sql": "SELECT   c.name,   SUM(p.amount) AS total_revenue FROM category AS c JOIN film_category AS fc   ON c.category_id = fc.category_id JOIN film AS f   ON fc.film_id = f.film_id JOIN inventory AS i   ON f.film_id = i.film_id JOIN rental AS r   ON i.inventory_id = r.inventory_id JOIN payment AS p   ON r.rental_id = p.rental_id GROUP BY   c.category_id,   c.name ORDER BY   total_revenue DESC LIMIT 1"
       },
@@ -355,9 +355,9 @@
         "match": false,
         "error": null,
         "llm_calls": 3,
-        "elapsed_ms": 5464,
+        "elapsed_ms": 4445,
         "retry_count": 0,
-        "agent_sql": "SELECT   COUNT(DISTINCT c.customer_id) AS customer_count FROM customer AS c JOIN payment AS p   ON c.customer_id = p.customer_id GROUP BY   c.customer_id HAVING   SUM(p.amount) > (     SELECT       AVG(total_spent)     FROM (       SELECT         SUM(amount) AS total_spent       FROM payment       GROUP BY         customer_id     ) AS avg_spending   ) LIMIT 100"
+        "agent_sql": "SELECT   COUNT(DISTINCT c.customer_id) AS customer_count FROM customer AS c JOIN payment AS p   ON c.customer_id = p.customer_id GROUP BY   c.customer_id HAVING   SUM(p.amount) > (     SELECT       AVG(total_spent)     FROM (       SELECT         SUM(amount) AS total_spent       FROM payment       GROUP BY         customer_id     ) AS avg_spent   ) LIMIT 100"
       },
       {
         "id": "hard_4",
@@ -365,7 +365,7 @@
         "match": true,
         "error": null,
         "llm_calls": 3,
-        "elapsed_ms": 6548,
+        "elapsed_ms": 4398,
         "retry_count": 0,
         "agent_sql": "SELECT   a.first_name,   a.last_name,   COUNT(fa.film_id) AS film_count FROM actor AS a JOIN film_actor AS fa   ON a.actor_id = fa.actor_id JOIN film_category AS fc   ON fa.film_id = fc.film_id JOIN category AS c   ON fc.category_id = c.category_id WHERE   c.name = 'Sports' GROUP BY   a.actor_id ORDER BY   film_count DESC LIMIT 1"
       },
@@ -375,9 +375,9 @@
         "match": true,
         "error": null,
         "llm_calls": 3,
-        "elapsed_ms": 4031,
+        "elapsed_ms": 4066,
         "retry_count": 0,
-        "agent_sql": "SELECT   ci.city,   COUNT(c.customer_id) AS customer_count FROM city AS ci JOIN address AS a   ON ci.city_id = a.city_id JOIN customer AS c   ON a.address_id = c.address_id GROUP BY   ci.city HAVING   COUNT(c.customer_id) > 1 LIMIT 100"
+        "agent_sql": "SELECT   ci.city,   COUNT(c.customer_id) AS customer_count FROM customer AS c JOIN address AS a   ON c.address_id = a.address_id JOIN city AS ci   ON a.city_id = ci.city_id GROUP BY   ci.city HAVING   COUNT(c.customer_id) > 1 LIMIT 100"
       },
       {
         "id": "hard_6",
@@ -385,7 +385,7 @@
         "match": true,
         "error": null,
         "llm_calls": 3,
-        "elapsed_ms": 5698,
+        "elapsed_ms": 4330,
         "retry_count": 0,
         "agent_sql": "SELECT   COUNT(*) FROM film WHERE   NOT film_id IN (     SELECT       film_id     FROM inventory     WHERE       inventory_id IN (         SELECT           inventory_id         FROM rental       )   ) LIMIT 100"
       },
@@ -395,7 +395,7 @@
         "match": true,
         "error": null,
         "llm_calls": 3,
-        "elapsed_ms": 5824,
+        "elapsed_ms": 4494,
         "retry_count": 0,
         "agent_sql": "SELECT   cat.name AS category,   AVG(f.length) AS average_length FROM category AS cat JOIN film_category AS fc   ON cat.category_id = fc.category_id JOIN film AS f   ON fc.film_id = f.film_id GROUP BY   cat.category_id HAVING   AVG(f.length) > (     SELECT       AVG(length)     FROM film   ) LIMIT 100"
       },
@@ -405,9 +405,9 @@
         "match": false,
         "error": null,
         "llm_calls": 3,
-        "elapsed_ms": 5053,
+        "elapsed_ms": 4709,
         "retry_count": 0,
-        "agent_sql": "SELECT   co.country FROM country AS co JOIN city AS ci   ON co.country_id = ci.country_id JOIN address AS a   ON ci.city_id = a.city_id JOIN customer AS c   ON a.address_id = c.address_id JOIN payment AS p   ON c.customer_id = p.customer_id GROUP BY   co.country ORDER BY   SUM(p.amount) DESC LIMIT 1"
+        "agent_sql": "SELECT   co.country FROM customer AS c JOIN address AS a   ON c.address_id = a.address_id JOIN city AS ci   ON a.city_id = ci.city_id JOIN country AS co   ON ci.country_id = co.country_id JOIN payment AS p   ON c.customer_id = p.customer_id GROUP BY   co.country ORDER BY   SUM(p.amount) DESC LIMIT 1"
       },
       {
         "id": "hard_9",
@@ -415,7 +415,7 @@
         "match": true,
         "error": null,
         "llm_calls": 3,
-        "elapsed_ms": 5325,
+        "elapsed_ms": 5243,
         "retry_count": 0,
         "agent_sql": "SELECT   f.rating,   COUNT(f.film_id) AS film_count FROM film AS f WHERE   f.length > 120 GROUP BY   f.rating LIMIT 100"
       },
@@ -425,122 +425,14 @@
         "match": false,
         "error": null,
         "llm_calls": 3,
-        "elapsed_ms": 3838,
+        "elapsed_ms": 4727,
         "retry_count": 0,
-        "agent_sql": "SELECT   COUNT(DISTINCT film_id) FROM inventory WHERE   store_id IN (1, 2) GROUP BY   film_id HAVING   COUNT(DISTINCT store_id) = 2 LIMIT 100"
+        "agent_sql": "SELECT   COUNT(DISTINCT i.film_id) FROM inventory AS i WHERE   i.store_id IN (1, 2) GROUP BY   i.film_id HAVING   COUNT(DISTINCT i.store_id) = 2 LIMIT 100"
       }
     ]
   },
   {
     "config": "bez Integrator",
-    "model": "openai/gpt-4o-mini",
-    "ex_ok": 7,
-    "ex_n": 10,
-    "pitanja": [
-      {
-        "id": "hard_1",
-        "category": "having",
-        "match": true,
-        "error": null,
-        "llm_calls": 4,
-        "elapsed_ms": 6611,
-        "retry_count": 0,
-        "agent_sql": "SELECT   a.first_name,   a.last_name,   COUNT(fa.film_id) AS film_count FROM actor AS a JOIN film_actor AS fa   ON a.actor_id = fa.actor_id GROUP BY   a.actor_id HAVING   COUNT(fa.film_id) > 35 LIMIT 100"
-      },
-      {
-        "id": "hard_2",
-        "category": "join5",
-        "match": true,
-        "error": null,
-        "llm_calls": 4,
-        "elapsed_ms": 8913,
-        "retry_count": 0,
-        "agent_sql": "SELECT   c.name,   SUM(p.amount) AS total_revenue FROM category AS c JOIN film_category AS fc   ON c.category_id = fc.category_id JOIN film AS f   ON fc.film_id = f.film_id JOIN inventory AS i   ON f.film_id = i.film_id JOIN rental AS r   ON i.inventory_id = r.inventory_id JOIN payment AS p   ON r.rental_id = p.rental_id GROUP BY   c.category_id,   c.name ORDER BY   total_revenue DESC LIMIT 1"
-      },
-      {
-        "id": "hard_3",
-        "category": "subquery",
-        "match": true,
-        "error": null,
-        "llm_calls": 4,
-        "elapsed_ms": 7354,
-        "retry_count": 0,
-        "agent_sql": "SELECT   COUNT(*) FROM (   SELECT     customer_id,     SUM(amount) AS total_spent   FROM payment   GROUP BY     customer_id ) AS customer_spending WHERE   total_spent > (     SELECT       AVG(total)     FROM (       SELECT         SUM(amount) AS total       FROM payment       GROUP BY         customer_id     ) AS avg_spending   ) LIMIT 100"
-      },
-      {
-        "id": "hard_4",
-        "category": "join4",
-        "match": true,
-        "error": null,
-        "llm_calls": 4,
-        "elapsed_ms": 7727,
-        "retry_count": 0,
-        "agent_sql": "SELECT   a.first_name,   a.last_name,   COUNT(fa.film_id) AS film_count FROM actor AS a JOIN film_actor AS fa   ON a.actor_id = fa.actor_id JOIN film_category AS fc   ON fa.film_id = fc.film_id JOIN category AS c   ON fc.category_id = c.category_id WHERE   c.name = 'Sports' GROUP BY   a.actor_id ORDER BY   film_count DESC LIMIT 1"
-      },
-      {
-        "id": "hard_5",
-        "category": "having",
-        "match": true,
-        "error": null,
-        "llm_calls": 4,
-        "elapsed_ms": 7773,
-        "retry_count": 0,
-        "agent_sql": "SELECT   c.city,   COUNT(cs.customer_id) AS customer_count FROM customer AS cs JOIN address AS a   ON cs.address_id = a.address_id JOIN city AS c   ON a.city_id = c.city_id GROUP BY   c.city HAVING   COUNT(cs.customer_id) > 1 LIMIT 100"
-      },
-      {
-        "id": "hard_6",
-        "category": "subquery",
-        "match": false,
-        "error": null,
-        "llm_calls": 4,
-        "elapsed_ms": 6526,
-        "retry_count": 0,
-        "agent_sql": "SELECT   COUNT(*) FROM film WHERE   NOT film_id IN (     SELECT DISTINCT       film_id     FROM rental   ) LIMIT 100"
-      },
-      {
-        "id": "hard_7",
-        "category": "subquery",
-        "match": true,
-        "error": null,
-        "llm_calls": 4,
-        "elapsed_ms": 7814,
-        "retry_count": 0,
-        "agent_sql": "SELECT   c.name AS category,   AVG(f.length) AS average_length FROM film AS f JOIN film_category AS fc   ON f.film_id = fc.film_id JOIN category AS c   ON fc.category_id = c.category_id GROUP BY   c.category_id HAVING   AVG(f.length) > (     SELECT       AVG(length)     FROM film   ) LIMIT 100"
-      },
-      {
-        "id": "hard_8",
-        "category": "join5",
-        "match": false,
-        "error": null,
-        "llm_calls": 4,
-        "elapsed_ms": 10430,
-        "retry_count": 0,
-        "agent_sql": "SELECT   co.country FROM customer AS c JOIN payment AS p   ON c.customer_id = p.customer_id JOIN address AS a   ON c.address_id = a.address_id JOIN city AS ci   ON a.city_id = ci.city_id JOIN country AS co   ON ci.country_id = co.country_id GROUP BY   co.country ORDER BY   SUM(p.amount) DESC LIMIT 1"
-      },
-      {
-        "id": "hard_9",
-        "category": "groupby",
-        "match": true,
-        "error": null,
-        "llm_calls": 4,
-        "elapsed_ms": 7536,
-        "retry_count": 0,
-        "agent_sql": "SELECT   f.rating,   COUNT(f.film_id) AS film_count FROM film AS f WHERE   f.length > 120 GROUP BY   f.rating LIMIT 100"
-      },
-      {
-        "id": "hard_10",
-        "category": "subquery",
-        "match": false,
-        "error": null,
-        "llm_calls": 4,
-        "elapsed_ms": 7379,
-        "retry_count": 0,
-        "agent_sql": "SELECT   COUNT(DISTINCT film_id) AS total_films FROM inventory WHERE   store_id IN (1, 2) LIMIT 100"
-      }
-    ]
-  },
-  {
-    "config": "bez Reflector",
     "model": "openai/gpt-4o-mini",
     "ex_ok": 8,
     "ex_n": 10,
@@ -551,7 +443,7 @@
         "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 7483,
+        "elapsed_ms": 7017,
         "retry_count": 0,
         "agent_sql": "SELECT   a.first_name,   a.last_name,   COUNT(fa.film_id) AS film_count FROM actor AS a JOIN film_actor AS fa   ON a.actor_id = fa.actor_id GROUP BY   a.actor_id HAVING   COUNT(fa.film_id) > 35 LIMIT 100"
       },
@@ -561,7 +453,7 @@
         "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 7672,
+        "elapsed_ms": 6974,
         "retry_count": 0,
         "agent_sql": "SELECT   c.name,   SUM(p.amount) AS total_revenue FROM category AS c JOIN film_category AS fc   ON c.category_id = fc.category_id JOIN film AS f   ON fc.film_id = f.film_id JOIN inventory AS i   ON f.film_id = i.film_id JOIN rental AS r   ON i.inventory_id = r.inventory_id JOIN payment AS p   ON r.rental_id = p.rental_id GROUP BY   c.category_id,   c.name ORDER BY   total_revenue DESC LIMIT 1"
       },
@@ -571,9 +463,9 @@
         "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 7703,
+        "elapsed_ms": 7286,
         "retry_count": 0,
-        "agent_sql": "SELECT   COUNT(*) FROM customer AS c WHERE   (     SELECT       SUM(p.amount)     FROM payment AS p     WHERE       p.customer_id = c.customer_id   ) > (     SELECT       AVG(total_spent)     FROM (       SELECT         SUM(amount) AS total_spent       FROM payment       GROUP BY         customer_id     ) AS avg_spent   ) LIMIT 100"
+        "agent_sql": "SELECT   COUNT(*) FROM (   SELECT     customer_id,     SUM(amount) AS total_spent   FROM payment   GROUP BY     customer_id ) AS customer_spending WHERE   total_spent > (     SELECT       AVG(total)     FROM (       SELECT         SUM(amount) AS total       FROM payment       GROUP BY         customer_id     ) AS avg_spending   ) LIMIT 100"
       },
       {
         "id": "hard_4",
@@ -581,7 +473,7 @@
         "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 8480,
+        "elapsed_ms": 5498,
         "retry_count": 0,
         "agent_sql": "SELECT   a.first_name,   a.last_name,   COUNT(fa.film_id) AS film_count FROM actor AS a JOIN film_actor AS fa   ON a.actor_id = fa.actor_id JOIN film_category AS fc   ON fa.film_id = fc.film_id JOIN category AS c   ON fc.category_id = c.category_id WHERE   c.name = 'Sports' GROUP BY   a.actor_id ORDER BY   film_count DESC LIMIT 1"
       },
@@ -591,115 +483,7 @@
         "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 10042,
-        "retry_count": 0,
-        "agent_sql": "SELECT   c.city,   COUNT(*) AS customer_count FROM city AS c JOIN address AS a   ON c.city_id = a.city_id JOIN customer AS cu   ON a.address_id = cu.address_id GROUP BY   c.city HAVING   COUNT(*) > 1 LIMIT 100"
-      },
-      {
-        "id": "hard_6",
-        "category": "subquery",
-        "match": false,
-        "error": null,
-        "llm_calls": 4,
-        "elapsed_ms": 5327,
-        "retry_count": 0,
-        "agent_sql": "SELECT   COUNT(*) FROM film WHERE   NOT film_id IN (     SELECT DISTINCT       film_id     FROM rental   ) LIMIT 100"
-      },
-      {
-        "id": "hard_7",
-        "category": "subquery",
-        "match": true,
-        "error": null,
-        "llm_calls": 4,
-        "elapsed_ms": 8591,
-        "retry_count": 0,
-        "agent_sql": "SELECT   c.name AS category,   AVG(f.length) AS average_length FROM category AS c JOIN film_category AS fc   ON c.category_id = fc.category_id JOIN film AS f   ON fc.film_id = f.film_id GROUP BY   c.category_id HAVING   AVG(f.length) > (     SELECT       AVG(length)     FROM film   ) LIMIT 100"
-      },
-      {
-        "id": "hard_8",
-        "category": "join5",
-        "match": true,
-        "error": null,
-        "llm_calls": 4,
-        "elapsed_ms": 8212,
-        "retry_count": 0,
-        "agent_sql": "SELECT   co.country FROM customer AS cu JOIN address AS a   ON cu.address_id = a.address_id JOIN city AS ci   ON a.city_id = ci.city_id JOIN country AS co   ON ci.country_id = co.country_id WHERE   cu.customer_id = (     SELECT       p.customer_id     FROM payment AS p     GROUP BY       p.customer_id     ORDER BY       SUM(p.amount) DESC     LIMIT 1   ) LIMIT 1"
-      },
-      {
-        "id": "hard_9",
-        "category": "groupby",
-        "match": true,
-        "error": null,
-        "llm_calls": 4,
-        "elapsed_ms": 6664,
-        "retry_count": 0,
-        "agent_sql": "SELECT   f.rating,   COUNT(*) AS film_count FROM film AS f WHERE   f.length > 120 GROUP BY   f.rating LIMIT 100"
-      },
-      {
-        "id": "hard_10",
-        "category": "subquery",
-        "match": false,
-        "error": null,
-        "llm_calls": 4,
-        "elapsed_ms": 7685,
-        "retry_count": 0,
-        "agent_sql": "SELECT   f.title,   COUNT(i.store_id) AS store_count FROM film AS f JOIN inventory AS i   ON f.film_id = i.film_id GROUP BY   f.film_id,   f.title HAVING   COUNT(i.store_id) = 2 LIMIT 100"
-      }
-    ]
-  },
-  {
-    "config": "bez Recorder",
-    "model": "openai/gpt-4o-mini",
-    "ex_ok": 6,
-    "ex_n": 10,
-    "pitanja": [
-      {
-        "id": "hard_1",
-        "category": "having",
-        "match": true,
-        "error": null,
-        "llm_calls": 4,
-        "elapsed_ms": 7279,
-        "retry_count": 0,
-        "agent_sql": "SELECT   a.first_name,   a.last_name,   COUNT(fa.film_id) AS film_count FROM actor AS a JOIN film_actor AS fa   ON a.actor_id = fa.actor_id GROUP BY   a.actor_id HAVING   COUNT(fa.film_id) > 35 LIMIT 100"
-      },
-      {
-        "id": "hard_2",
-        "category": "join5",
-        "match": true,
-        "error": null,
-        "llm_calls": 4,
-        "elapsed_ms": 9904,
-        "retry_count": 0,
-        "agent_sql": "SELECT   c.name,   SUM(p.amount) AS total_revenue FROM category AS c JOIN film_category AS fc   ON c.category_id = fc.category_id JOIN film AS f   ON fc.film_id = f.film_id JOIN inventory AS i   ON f.film_id = i.film_id JOIN rental AS r   ON i.inventory_id = r.inventory_id JOIN payment AS p   ON r.rental_id = p.rental_id GROUP BY   c.category_id,   c.name ORDER BY   total_revenue DESC LIMIT 1"
-      },
-      {
-        "id": "hard_3",
-        "category": "subquery",
-        "match": false,
-        "error": null,
-        "llm_calls": 4,
-        "elapsed_ms": 8225,
-        "retry_count": 0,
-        "agent_sql": "SELECT   COUNT(DISTINCT c.customer_id) FROM customer AS c JOIN payment AS p   ON c.customer_id = p.customer_id GROUP BY   c.customer_id HAVING   SUM(p.amount) > (     SELECT       AVG(total_spent)     FROM (       SELECT         SUM(amount) AS total_spent       FROM payment       GROUP BY         customer_id     ) AS avg_spent   ) LIMIT 100"
-      },
-      {
-        "id": "hard_4",
-        "category": "join4",
-        "match": true,
-        "error": null,
-        "llm_calls": 4,
-        "elapsed_ms": 8007,
-        "retry_count": 0,
-        "agent_sql": "SELECT   a.first_name,   a.last_name,   COUNT(fa.film_id) AS film_count FROM actor AS a JOIN film_actor AS fa   ON a.actor_id = fa.actor_id JOIN film_category AS fc   ON fa.film_id = fc.film_id JOIN category AS c   ON fc.category_id = c.category_id WHERE   c.name = 'Sports' GROUP BY   a.actor_id ORDER BY   film_count DESC LIMIT 1"
-      },
-      {
-        "id": "hard_5",
-        "category": "having",
-        "match": true,
-        "error": null,
-        "llm_calls": 4,
-        "elapsed_ms": 8823,
+        "elapsed_ms": 5152,
         "retry_count": 0,
         "agent_sql": "SELECT   ci.city,   COUNT(c.customer_id) AS customer_count FROM customer AS c JOIN address AS a   ON c.address_id = a.address_id JOIN city AS ci   ON a.city_id = ci.city_id GROUP BY   ci.city HAVING   COUNT(c.customer_id) > 1 LIMIT 100"
       },
@@ -709,7 +493,7 @@
         "match": false,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 7178,
+        "elapsed_ms": 4674,
         "retry_count": 0,
         "agent_sql": "SELECT   COUNT(*) FROM film WHERE   NOT film_id IN (     SELECT DISTINCT       film_id     FROM rental   ) LIMIT 100"
       },
@@ -719,7 +503,7 @@
         "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 7523,
+        "elapsed_ms": 7154,
         "retry_count": 0,
         "agent_sql": "SELECT   c.name AS category,   AVG(f.length) AS average_length FROM film AS f JOIN film_category AS fc   ON f.film_id = fc.film_id JOIN category AS c   ON fc.category_id = c.category_id GROUP BY   c.category_id HAVING   AVG(f.length) > (     SELECT       AVG(length)     FROM film   ) LIMIT 100"
       },
@@ -729,7 +513,7 @@
         "match": false,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 6916,
+        "elapsed_ms": 6237,
         "retry_count": 0,
         "agent_sql": "SELECT   co.country FROM customer AS c JOIN payment AS p   ON c.customer_id = p.customer_id JOIN address AS a   ON c.address_id = a.address_id JOIN city AS ci   ON a.city_id = ci.city_id JOIN country AS co   ON ci.country_id = co.country_id GROUP BY   co.country ORDER BY   SUM(p.amount) DESC LIMIT 1"
       },
@@ -739,9 +523,117 @@
         "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 5813,
+        "elapsed_ms": 5530,
         "retry_count": 0,
-        "agent_sql": "SELECT   f.rating,   COUNT(f.film_id) AS film_count FROM film AS f WHERE   f.length > 120 GROUP BY   f.rating LIMIT 100"
+        "agent_sql": "SELECT   f.rating,   COUNT(f.film_id) AS film_count FROM film AS f WHERE   f.length > 120 GROUP BY   f.rating ORDER BY   f.rating LIMIT 100"
+      },
+      {
+        "id": "hard_10",
+        "category": "subquery",
+        "match": true,
+        "error": null,
+        "llm_calls": 4,
+        "elapsed_ms": 5191,
+        "retry_count": 0,
+        "agent_sql": "SELECT   COUNT(*) FROM (   SELECT     film_id   FROM inventory   GROUP BY     film_id   HAVING     COUNT(DISTINCT store_id) > 1 ) AS subquery LIMIT 100"
+      }
+    ]
+  },
+  {
+    "config": "bez Reflector",
+    "model": "openai/gpt-4o-mini",
+    "ex_ok": 7,
+    "ex_n": 10,
+    "pitanja": [
+      {
+        "id": "hard_1",
+        "category": "having",
+        "match": true,
+        "error": null,
+        "llm_calls": 4,
+        "elapsed_ms": 7626,
+        "retry_count": 0,
+        "agent_sql": "SELECT   a.first_name,   a.last_name,   COUNT(fa.film_id) AS film_count FROM actor AS a JOIN film_actor AS fa   ON a.actor_id = fa.actor_id GROUP BY   a.actor_id HAVING   COUNT(fa.film_id) > 35 LIMIT 100"
+      },
+      {
+        "id": "hard_2",
+        "category": "join5",
+        "match": true,
+        "error": null,
+        "llm_calls": 4,
+        "elapsed_ms": 7391,
+        "retry_count": 0,
+        "agent_sql": "SELECT   c.name,   SUM(p.amount) AS total_revenue FROM category AS c JOIN film_category AS fc   ON c.category_id = fc.category_id JOIN film AS f   ON fc.film_id = f.film_id JOIN inventory AS i   ON f.film_id = i.film_id JOIN rental AS r   ON i.inventory_id = r.inventory_id JOIN payment AS p   ON r.rental_id = p.rental_id GROUP BY   c.category_id,   c.name ORDER BY   total_revenue DESC LIMIT 1"
+      },
+      {
+        "id": "hard_3",
+        "category": "subquery",
+        "match": true,
+        "error": null,
+        "llm_calls": 4,
+        "elapsed_ms": 5437,
+        "retry_count": 0,
+        "agent_sql": "SELECT   COUNT(*) FROM (   SELECT     customer_id,     SUM(amount) AS total_spent   FROM payment   GROUP BY     customer_id ) AS customer_spending WHERE   total_spent > (     SELECT       AVG(total)     FROM (       SELECT         SUM(amount) AS total       FROM payment       GROUP BY         customer_id     ) AS avg_spending   ) LIMIT 100"
+      },
+      {
+        "id": "hard_4",
+        "category": "join4",
+        "match": true,
+        "error": null,
+        "llm_calls": 4,
+        "elapsed_ms": 7415,
+        "retry_count": 0,
+        "agent_sql": "SELECT   a.first_name,   a.last_name,   COUNT(fa.film_id) AS film_count FROM actor AS a JOIN film_actor AS fa   ON a.actor_id = fa.actor_id JOIN film_category AS fc   ON fa.film_id = fc.film_id JOIN category AS c   ON fc.category_id = c.category_id WHERE   c.name = 'Sports' GROUP BY   a.actor_id ORDER BY   film_count DESC LIMIT 1"
+      },
+      {
+        "id": "hard_5",
+        "category": "having",
+        "match": true,
+        "error": null,
+        "llm_calls": 4,
+        "elapsed_ms": 6912,
+        "retry_count": 0,
+        "agent_sql": "SELECT   ci.city,   COUNT(c.customer_id) AS customer_count FROM customer AS c JOIN address AS a   ON c.address_id = a.address_id JOIN city AS ci   ON a.city_id = ci.city_id GROUP BY   ci.city HAVING   COUNT(c.customer_id) > 1 LIMIT 100"
+      },
+      {
+        "id": "hard_6",
+        "category": "subquery",
+        "match": false,
+        "error": null,
+        "llm_calls": 4,
+        "elapsed_ms": 6137,
+        "retry_count": 0,
+        "agent_sql": "SELECT   COUNT(*) FROM film WHERE   NOT film_id IN (     SELECT DISTINCT       film_id     FROM rental   ) LIMIT 100"
+      },
+      {
+        "id": "hard_7",
+        "category": "subquery",
+        "match": true,
+        "error": null,
+        "llm_calls": 4,
+        "elapsed_ms": 6667,
+        "retry_count": 0,
+        "agent_sql": "SELECT   c.name AS category,   AVG(f.length) AS average_length FROM film AS f JOIN film_category AS fc   ON f.film_id = fc.film_id JOIN category AS c   ON fc.category_id = c.category_id GROUP BY   c.category_id HAVING   AVG(f.length) > (     SELECT       AVG(length)     FROM film   ) LIMIT 100"
+      },
+      {
+        "id": "hard_8",
+        "category": "join5",
+        "match": false,
+        "error": null,
+        "llm_calls": 4,
+        "elapsed_ms": 6863,
+        "retry_count": 0,
+        "agent_sql": "SELECT   co.country FROM customer AS c JOIN payment AS p   ON c.customer_id = p.customer_id JOIN address AS a   ON c.address_id = a.address_id JOIN city AS ci   ON a.city_id = ci.city_id JOIN country AS co   ON ci.country_id = co.country_id GROUP BY   co.country ORDER BY   SUM(p.amount) DESC LIMIT 1"
+      },
+      {
+        "id": "hard_9",
+        "category": "groupby",
+        "match": true,
+        "error": null,
+        "llm_calls": 4,
+        "elapsed_ms": 6161,
+        "retry_count": 0,
+        "agent_sql": "SELECT   f.rating,   COUNT(f.film_id) AS film_count FROM film AS f WHERE   f.length > 120 GROUP BY   f.rating ORDER BY   f.rating LIMIT 100"
       },
       {
         "id": "hard_10",
@@ -749,9 +641,117 @@
         "match": false,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 7487,
+        "elapsed_ms": 6163,
         "retry_count": 0,
-        "agent_sql": "SELECT   COUNT(DISTINCT film_id) FROM inventory WHERE   store_id IN (1, 2) LIMIT 100"
+        "agent_sql": "SELECT   COUNT(DISTINCT film_id) FROM inventory WHERE   store_id IN (1, 2) GROUP BY   film_id HAVING   COUNT(DISTINCT store_id) = 2 LIMIT 100"
+      }
+    ]
+  },
+  {
+    "config": "bez Recorder",
+    "model": "openai/gpt-4o-mini",
+    "ex_ok": 7,
+    "ex_n": 10,
+    "pitanja": [
+      {
+        "id": "hard_1",
+        "category": "having",
+        "match": true,
+        "error": null,
+        "llm_calls": 4,
+        "elapsed_ms": 6660,
+        "retry_count": 0,
+        "agent_sql": "SELECT   a.first_name,   a.last_name,   COUNT(fa.film_id) AS film_count FROM actor AS a JOIN film_actor AS fa   ON a.actor_id = fa.actor_id GROUP BY   a.actor_id HAVING   COUNT(fa.film_id) > 35 LIMIT 100"
+      },
+      {
+        "id": "hard_2",
+        "category": "join5",
+        "match": true,
+        "error": null,
+        "llm_calls": 4,
+        "elapsed_ms": 7274,
+        "retry_count": 0,
+        "agent_sql": "SELECT   c.name,   SUM(p.amount) AS total_revenue FROM category AS c JOIN film_category AS fc   ON c.category_id = fc.category_id JOIN film AS f   ON fc.film_id = f.film_id JOIN inventory AS i   ON f.film_id = i.film_id JOIN rental AS r   ON i.inventory_id = r.inventory_id JOIN payment AS p   ON r.rental_id = p.rental_id GROUP BY   c.category_id,   c.name ORDER BY   total_revenue DESC LIMIT 1"
+      },
+      {
+        "id": "hard_3",
+        "category": "subquery",
+        "match": true,
+        "error": null,
+        "llm_calls": 4,
+        "elapsed_ms": 7063,
+        "retry_count": 0,
+        "agent_sql": "SELECT   COUNT(*) FROM (   SELECT     customer_id,     SUM(amount) AS total_spent   FROM payment   GROUP BY     customer_id ) AS customer_spending WHERE   total_spent > (     SELECT       AVG(total)     FROM (       SELECT         SUM(amount) AS total       FROM payment       GROUP BY         customer_id     ) AS avg_spending   ) LIMIT 100"
+      },
+      {
+        "id": "hard_4",
+        "category": "join4",
+        "match": true,
+        "error": null,
+        "llm_calls": 4,
+        "elapsed_ms": 7151,
+        "retry_count": 0,
+        "agent_sql": "SELECT   a.first_name,   a.last_name,   COUNT(fa.film_id) AS film_count FROM actor AS a JOIN film_actor AS fa   ON a.actor_id = fa.actor_id JOIN film_category AS fc   ON fa.film_id = fc.film_id JOIN category AS c   ON fc.category_id = c.category_id WHERE   c.name = 'Sports' GROUP BY   a.actor_id ORDER BY   film_count DESC LIMIT 1"
+      },
+      {
+        "id": "hard_5",
+        "category": "having",
+        "match": true,
+        "error": null,
+        "llm_calls": 4,
+        "elapsed_ms": 6452,
+        "retry_count": 0,
+        "agent_sql": "SELECT   ci.city,   COUNT(c.customer_id) AS customer_count FROM customer AS c JOIN address AS a   ON c.address_id = a.address_id JOIN city AS ci   ON a.city_id = ci.city_id GROUP BY   ci.city HAVING   COUNT(c.customer_id) > 1 LIMIT 100"
+      },
+      {
+        "id": "hard_6",
+        "category": "subquery",
+        "match": false,
+        "error": null,
+        "llm_calls": 5,
+        "elapsed_ms": 7864,
+        "retry_count": 1,
+        "agent_sql": "SELECT   COUNT(*) FROM film AS f LEFT JOIN inventory AS i   ON f.film_id = i.film_id LEFT JOIN rental AS r   ON i.inventory_id = r.inventory_id WHERE   r.inventory_id IS NULL LIMIT 100"
+      },
+      {
+        "id": "hard_7",
+        "category": "subquery",
+        "match": true,
+        "error": null,
+        "llm_calls": 4,
+        "elapsed_ms": 7049,
+        "retry_count": 0,
+        "agent_sql": "SELECT   c.name AS category,   AVG(f.length) AS average_length FROM film AS f JOIN film_category AS fc   ON f.film_id = fc.film_id JOIN category AS c   ON fc.category_id = c.category_id GROUP BY   c.category_id HAVING   AVG(f.length) > (     SELECT       AVG(length)     FROM film   ) LIMIT 100"
+      },
+      {
+        "id": "hard_8",
+        "category": "join5",
+        "match": false,
+        "error": null,
+        "llm_calls": 4,
+        "elapsed_ms": 6091,
+        "retry_count": 0,
+        "agent_sql": "SELECT   co.country FROM customer AS c JOIN payment AS p   ON c.customer_id = p.customer_id JOIN address AS a   ON c.address_id = a.address_id JOIN city AS ci   ON a.city_id = ci.city_id JOIN country AS co   ON ci.country_id = co.country_id GROUP BY   co.country ORDER BY   SUM(p.amount) DESC LIMIT 1"
+      },
+      {
+        "id": "hard_9",
+        "category": "groupby",
+        "match": true,
+        "error": null,
+        "llm_calls": 4,
+        "elapsed_ms": 6218,
+        "retry_count": 0,
+        "agent_sql": "SELECT   f.rating,   COUNT(f.film_id) AS film_count FROM film AS f WHERE   f.length > 120 GROUP BY   f.rating ORDER BY   f.rating LIMIT 100"
+      },
+      {
+        "id": "hard_10",
+        "category": "subquery",
+        "match": false,
+        "error": null,
+        "llm_calls": 4,
+        "elapsed_ms": 6730,
+        "retry_count": 0,
+        "agent_sql": "SELECT   COUNT(DISTINCT i.film_id) FROM inventory AS i WHERE   i.store_id IN (1, 2) GROUP BY   i.film_id HAVING   COUNT(DISTINCT i.store_id) = 2 LIMIT 100"
       }
     ]
   },
@@ -767,29 +767,29 @@
         "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 9484,
+        "elapsed_ms": 5551,
         "retry_count": 0,
         "agent_sql": "SELECT   a.first_name,   a.last_name,   COUNT(fa.film_id) AS film_count FROM actor AS a JOIN film_actor AS fa   ON a.actor_id = fa.actor_id GROUP BY   a.actor_id HAVING   COUNT(fa.film_id) > 35 LIMIT 100"
       },
       {
         "id": "hard_2",
         "category": "join5",
-        "match": false,
+        "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 6605,
+        "elapsed_ms": 6127,
         "retry_count": 0,
-        "agent_sql": "SELECT   c.name AS category_name,   SUM(p.amount) AS total_revenue FROM film_category AS fc JOIN film AS f   ON fc.film_id = f.film_id JOIN payment AS p   ON f.film_id = p.rental_id JOIN category AS c   ON fc.category_id = c.category_id GROUP BY   c.name ORDER BY   total_revenue DESC LIMIT 1"
+        "agent_sql": "SELECT   c.name AS category_name,   SUM(p.amount) AS total_revenue FROM film AS f JOIN film_category AS fc   ON f.film_id = fc.film_id JOIN category AS c   ON fc.category_id = c.category_id JOIN inventory AS i   ON f.film_id = i.film_id JOIN rental AS r   ON i.inventory_id = r.inventory_id JOIN payment AS p   ON r.rental_id = p.rental_id GROUP BY   c.name ORDER BY   total_revenue DESC LIMIT 1"
       },
       {
         "id": "hard_3",
         "category": "subquery",
-        "match": true,
+        "match": false,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 8086,
+        "elapsed_ms": 7302,
         "retry_count": 0,
-        "agent_sql": "SELECT   COUNT(*) AS broj_kupaca FROM (   SELECT     customer_id,     SUM(amount) AS ukupna_potrosnja   FROM payment   GROUP BY     customer_id ) AS potrosnja WHERE   ukupna_potrosnja > (     SELECT       AVG(ukupna_potrosnja)     FROM (       SELECT         SUM(amount) AS ukupna_potrosnja       FROM payment       GROUP BY         customer_id     ) AS avg_potrosnja   ) LIMIT 100"
+        "agent_sql": "SELECT   COUNT(DISTINCT c.customer_id) AS broj_kupaca FROM customer AS c JOIN payment AS p   ON c.customer_id = p.customer_id GROUP BY   c.customer_id HAVING   SUM(p.amount) > (     SELECT       AVG(total_spending)     FROM (       SELECT         SUM(amount) AS total_spending       FROM payment       GROUP BY         customer_id     ) AS avg_spending   ) LIMIT 100"
       },
       {
         "id": "hard_4",
@@ -797,7 +797,7 @@
         "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 8401,
+        "elapsed_ms": 7619,
         "retry_count": 0,
         "agent_sql": "SELECT   a.first_name,   a.last_name,   COUNT(fa.film_id) AS film_count FROM actor AS a JOIN film_actor AS fa   ON a.actor_id = fa.actor_id JOIN film_category AS fc   ON fa.film_id = fc.film_id JOIN category AS c   ON fc.category_id = c.category_id WHERE   c.name = 'Sports' GROUP BY   a.actor_id ORDER BY   film_count DESC LIMIT 1"
       },
@@ -807,7 +807,7 @@
         "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 7791,
+        "elapsed_ms": 7374,
         "retry_count": 0,
         "agent_sql": "SELECT   city.city,   COUNT(customer.customer_id) AS broj_kupaca FROM customer JOIN address   ON customer.address_id = address.address_id JOIN city   ON address.city_id = city.city_id GROUP BY   city.city HAVING   COUNT(customer.customer_id) > 1 LIMIT 100"
       },
@@ -817,9 +817,9 @@
         "match": false,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 7567,
+        "elapsed_ms": 6302,
         "retry_count": 0,
-        "agent_sql": "SELECT   COUNT(*) AS broj_filmova_nikada_iznajmljenih FROM film WHERE   NOT film_id IN (     SELECT DISTINCT       film_id     FROM rental   ) LIMIT 100"
+        "agent_sql": "SELECT   COUNT(f.film_id) AS broj_filmova_nikada_iznajmljenih FROM film AS f JOIN inventory AS i   ON f.film_id = i.film_id LEFT JOIN rental AS r   ON i.inventory_id = r.inventory_id WHERE   r.rental_id IS NULL LIMIT 100"
       },
       {
         "id": "hard_7",
@@ -827,7 +827,7 @@
         "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 7559,
+        "elapsed_ms": 6715,
         "retry_count": 0,
         "agent_sql": "SELECT   c.name AS category,   AVG(f.length) AS average_length FROM film AS f JOIN film_category AS fc   ON f.film_id = fc.film_id JOIN category AS c   ON fc.category_id = c.category_id GROUP BY   c.name HAVING   AVG(f.length) > (     SELECT       AVG(length)     FROM film   ) LIMIT 100"
       },
@@ -837,9 +837,9 @@
         "match": false,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 5668,
+        "elapsed_ms": 5994,
         "retry_count": 0,
-        "agent_sql": "SELECT   country.country FROM payment JOIN customer   ON payment.customer_id = customer.customer_id JOIN address   ON customer.address_id = address.address_id JOIN city   ON address.city_id = city.city_id JOIN country   ON city.country_id = country.country_id GROUP BY   country.country ORDER BY   SUM(payment.amount) DESC LIMIT 1"
+        "agent_sql": "SELECT   country.country FROM customer JOIN address   ON customer.address_id = address.address_id JOIN city   ON address.city_id = city.city_id JOIN country   ON city.country_id = country.country_id JOIN payment   ON customer.customer_id = payment.customer_id GROUP BY   country.country ORDER BY   SUM(payment.amount) DESC LIMIT 1"
       },
       {
         "id": "hard_9",
@@ -847,7 +847,7 @@
         "match": true,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 6660,
+        "elapsed_ms": 6591,
         "retry_count": 0,
         "agent_sql": "SELECT   rating,   COUNT(*) AS broj_filmova FROM film WHERE   length > 120 GROUP BY   rating LIMIT 100"
       },
@@ -857,7 +857,7 @@
         "match": false,
         "error": null,
         "llm_calls": 4,
-        "elapsed_ms": 6783,
+        "elapsed_ms": 5937,
         "retry_count": 0,
         "agent_sql": "SELECT   COUNT(DISTINCT film_id) AS broj_filmova FROM inventory WHERE   store_id IN (1, 2) LIMIT 100"
       }
@@ -875,7 +875,7 @@
         "match": false,
         "error": "Nisam uspeo da sastavim ispravan upit za ovo pitanje. Pokušaj da ga preformulišeš jasnije ili jednostavnije.",
         "llm_calls": 1,
-        "elapsed_ms": 1578,
+        "elapsed_ms": 1152,
         "retry_count": 0,
         "agent_sql": "SELECT actors.first_name, actors.last_name, COUNT(movies.id) AS movie_count FROM actors JOIN movie_actors ON actors.id = movie_actors.actor_id JOIN movies ON movie_actors.movie_id = movies.id GROUP BY actors.id HAVING COUNT(movies.id) > 35"
       },
@@ -885,7 +885,7 @@
         "match": false,
         "error": "Nisam uspeo da sastavim ispravan upit za ovo pitanje. Pokušaj da ga preformulišeš jasnije ili jednostavnije.",
         "llm_calls": 1,
-        "elapsed_ms": 1200,
+        "elapsed_ms": 968,
         "retry_count": 0,
         "agent_sql": "SELECT category, SUM(revenue) AS total_revenue FROM films GROUP BY category ORDER BY total_revenue DESC LIMIT 1"
       },
@@ -895,7 +895,7 @@
         "match": false,
         "error": "Nisam uspeo da sastavim ispravan upit za ovo pitanje. Pokušaj da ga preformulišeš jasnije ili jednostavnije.",
         "llm_calls": 1,
-        "elapsed_ms": 1952,
+        "elapsed_ms": 1203,
         "retry_count": 0,
         "agent_sql": "SELECT COUNT(DISTINCT customer_id) AS broj_kupaca FROM purchases GROUP BY customer_id HAVING SUM(amount) > (SELECT AVG(total_spent) FROM (SELECT SUM(amount) AS total_spent FROM purchases GROUP BY customer_id) AS avg_spent)"
       },
@@ -905,7 +905,7 @@
         "match": false,
         "error": "Nisam uspeo da sastavim ispravan upit za ovo pitanje. Pokušaj da ga preformulišeš jasnije ili jednostavnije.",
         "llm_calls": 1,
-        "elapsed_ms": 1187,
+        "elapsed_ms": 1128,
         "retry_count": 0,
         "agent_sql": "SELECT a.first_name, a.last_name, COUNT(f.id) AS film_count FROM actors a JOIN film_actors fa ON a.id = fa.actor_id JOIN films f ON fa.film_id = f.id WHERE f.category = 'Sports' GROUP BY a.id ORDER BY film_count DESC LIMIT 1"
       },
@@ -915,7 +915,7 @@
         "match": false,
         "error": "Nisam uspeo da sastavim ispravan upit za ovo pitanje. Pokušaj da ga preformulišeš jasnije ili jednostavnije.",
         "llm_calls": 1,
-        "elapsed_ms": 1367,
+        "elapsed_ms": 1560,
         "retry_count": 0,
         "agent_sql": "SELECT city, COUNT(customer_id) AS customer_count FROM customers GROUP BY city HAVING COUNT(customer_id) > 1"
       },
@@ -925,9 +925,9 @@
         "match": false,
         "error": "Nisam uspeo da sastavim ispravan upit za ovo pitanje. Pokušaj da ga preformulišeš jasnije ili jednostavnije.",
         "llm_calls": 1,
-        "elapsed_ms": 2193,
+        "elapsed_ms": 1636,
         "retry_count": 0,
-        "agent_sql": "SELECT COUNT(*) AS broj_filmova_nikada_iznajmljenih  FROM filmovi  WHERE film_id NOT IN (SELECT film_id FROM iznajmljivanja)"
+        "agent_sql": "SELECT COUNT(*) AS broj_filmova_nikada_iznajmljenih  FROM filmovi  WHERE film_id NOT IN (SELECT DISTINCT film_id FROM iznajmljivanja)"
       },
       {
         "id": "hard_7",
@@ -935,7 +935,7 @@
         "match": false,
         "error": "Nisam uspeo da sastavim ispravan upit za ovo pitanje. Pokušaj da ga preformulišeš jasnije ili jednostavnije.",
         "llm_calls": 1,
-        "elapsed_ms": 1428,
+        "elapsed_ms": 1130,
         "retry_count": 0,
         "agent_sql": "SELECT c.category_name, AVG(m.length) AS average_length FROM categories c JOIN movies m ON c.category_id = m.category_id GROUP BY c.category_name HAVING AVG(m.length) > (SELECT AVG(length) FROM movies)"
       },
@@ -945,7 +945,7 @@
         "match": false,
         "error": "Nisam uspeo da sastavim ispravan upit za ovo pitanje. Pokušaj da ga preformulišeš jasnije ili jednostavnije.",
         "llm_calls": 1,
-        "elapsed_ms": 1237,
+        "elapsed_ms": 1447,
         "retry_count": 0,
         "agent_sql": "SELECT c.country FROM customers c JOIN orders o ON c.customer_id = o.customer_id GROUP BY c.country ORDER BY SUM(o.total_amount) DESC LIMIT 1"
       },
@@ -955,7 +955,7 @@
         "match": false,
         "error": "Nisam uspeo da sastavim ispravan upit za ovo pitanje. Pokušaj da ga preformulišeš jasnije ili jednostavnije.",
         "llm_calls": 1,
-        "elapsed_ms": 1040,
+        "elapsed_ms": 912,
         "retry_count": 0,
         "agent_sql": "SELECT rating, COUNT(*) AS broj FROM films WHERE duration > 120 GROUP BY rating"
       },
@@ -965,9 +965,9 @@
         "match": false,
         "error": "Nisam uspeo da sastavim ispravan upit za ovo pitanje. Pokušaj da ga preformulišeš jasnije ili jednostavnije.",
         "llm_calls": 1,
-        "elapsed_ms": 2762,
+        "elapsed_ms": 1858,
         "retry_count": 0,
-        "agent_sql": "SELECT COUNT(DISTINCT f.id) AS broj_filmova FROM filmovi f JOIN prodavnica p1 ON f.id = p1.film_id JOIN prodavnica p2 ON f.id = p2.film_id WHERE p1.id <> p2.id"
+        "agent_sql": "SELECT COUNT(DISTINCT f.id) AS broj_filmova FROM film f JOIN inventar i1 ON f.id = i1.film_id JOIN prodavnica p1 ON i1.prodavnica_id = p1.id JOIN inventar i2 ON f.id = i2.film_id JOIN prodavnica p2 ON i2.prodavnica_id = p2.id WHERE p1.id <> p2.id"
       }
     ]
   }

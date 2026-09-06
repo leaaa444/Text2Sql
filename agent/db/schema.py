@@ -47,8 +47,7 @@ def get_schema_text():
             continue
         tables.setdefault(table, []).append(f"{column} {data_type}")
 
-    _, fk_rows = run_query(_FK_SQL)
-    fks = [r for r in fk_rows if r[0] in allowed and r[2] in allowed]
+    fks = get_foreign_keys()
 
     lines = [f"{table}(" + ", ".join(cols) + ")" for table, cols in tables.items()]
     if fks:
@@ -62,3 +61,13 @@ def get_schema_text():
 def get_table_names():
     _, rows = run_query(_BASE_TABLES_SQL)
     return [row[0] for row in rows]
+
+
+def get_foreign_keys():
+    allowed = set(get_table_names())
+    _, rows = run_query(_FK_SQL)
+    return [
+        (table, column, ftable, fcolumn)
+        for table, column, ftable, fcolumn in rows
+        if table in allowed and ftable in allowed
+    ]

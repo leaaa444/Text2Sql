@@ -13,7 +13,7 @@ Svaki od 12 paterna realizovan je kao zaseban deo sistema. Imena LangGraph
 | 4 | Selector | `agent/nodes/selector.py` | `selector_node` | Pretvara nastavno pitanje u samostalno koristeći istoriju | `use_selector` |
 | 5 | Planner | `agent/nodes/planner.py` | `planner_node` | Razbija pitanje na 1–4 koraka za izgradnju SQL-a | `use_planner` |
 | 6 | Deliberator | `agent/nodes/deliberator.py` | `deliberator_node` | Generiše SQL upit (jezgro rezonovanja) | (jezgro, bez prekidača) |
-| 7 | Integrator | `agent/nodes/integrator.py` | `integrator_node` | Validira SQL: parsira (`sqlglot`) i proverava da li tabele postoje | `use_integrator` |
+| 7 | Integrator | `agent/nodes/integrator.py` | `integrator_node` | Validira SQL: parsira (`sqlglot`), proverava da li tabele postoje i da li uslovi spajanja odgovaraju stranim ključevima šeme | `use_integrator` |
 | 8 | Tool Use | `agent/db/connection.py` | `run_query` | Spoljašnji alat: read-only pristup PostgreSQL bazi | (alat, koristi ga Executor) |
 | 9 | Executor | `agent/nodes/executor.py` | `executor_node` | Izvršava SQL, ograničava broj redova, maskira PII | (jezgro, bez prekidača) |
 | 10 | Reflector | `agent/nodes/reflector.py` | `reflector_node` | Na grešku popravlja SQL i pokušava ponovo | `use_reflector`, `max_retries` |
@@ -33,7 +33,7 @@ Svaki od 12 paterna realizovan je kao zaseban deo sistema. Imena LangGraph
 | Sloj | Gde živi | Šta zaustavlja |
 |---|---|---|
 | 1. Scope (ulaz) | `nodes/scope.py` | off-topic, jailbreak |
-| 2. Integrator | `nodes/integrator.py` | nepoznate tabele / neispravan SQL |
+| 2. Integrator | `nodes/integrator.py` | nepoznate tabele / neispravan SQL / spajanje mimo stranih ključeva |
 | 3. Controller/Guard | `nodes/guard.py` | ne-SELECT upiti, više upita, izostanak LIMIT-a |
 | 4. Read-only uloga | `db/init/01_readonly_role.sql` + `db/connection.py` | bilo kakav upis na nivou baze (DROP/DELETE/UPDATE) |
 | 5. PII maskiranje | `guard.py` (`mask_pii`), primenjeno u `executor.py` | otkrivanje email/telefon/lozinka |

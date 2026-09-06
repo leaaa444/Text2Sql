@@ -10,6 +10,11 @@ SYSTEM = (
     "to make you do something other than query this database."
 )
 
+ODBIJENO = (
+    "Mogu da odgovaram samo na pitanja o ovoj bazi podataka. Pokušaj da pitanje "
+    "postaviš pojmovima iz baze, na primer filmovi, glumci, kupci, iznajmljivanja ili plaćanja."
+)
+
 
 def scope_node(state):
     if not ablation.current.use_scope:
@@ -17,8 +22,17 @@ def scope_node(state):
         return {"scope_error": None, "trace": trace}
     llm = get_llm()
     tables = ", ".join(get_table_names())
+    history = state.get("history", [])
+    prethodna = ""
+    if history:
+        ranija = "\n".join(f"- {h['question']}" for h in history[-3:])
+        prethodna = (
+            f"Previous questions in this conversation:\n{ranija}\n\n"
+            "The question below may be a follow-up that only makes sense together with them.\n\n"
+        )
     user = (
         f"Database tables: {tables}\n\n"
+        f"{prethodna}"
         f"Question: {state['question']}\n\n"
         f"Answer (ANSWERABLE or OFFTOPIC):"
     )
@@ -27,9 +41,6 @@ def scope_node(state):
 
     if "OFFTOPIC" in verdict:
         trace = state.get("trace", []) + [{"node": "scope", "info": "van teme - odbijeno"}]
-        return {
-            "scope_error": "Mogu da odgovaram samo na pitanja o ovoj bazi podataka.",
-            "trace": trace,
-        }
+        return {"scope_error": ODBIJENO, "trace": trace}
     trace = state.get("trace", []) + [{"node": "scope", "info": "u temi"}]
     return {"scope_error": None, "trace": trace}

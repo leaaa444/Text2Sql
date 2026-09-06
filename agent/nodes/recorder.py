@@ -17,6 +17,6 @@ def recorder_save_node(state):
     if not ablation.current.use_recorder:
         trace = state.get("trace", []) + [{"node": "recorder_save", "info": "iskljucen"}]
         return {"trace": trace}
-    memory.save_turn(state.get("question", ""), state.get("sql", ""))
+    memory.save_turn(state.get("question", ""), state.get("sql", ""), state.get("summary", ""))
     trace = state.get("trace", []) + [{"node": "recorder_save", "info": "zapamceno pitanje"}]
     return {"trace": trace}
